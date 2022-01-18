@@ -1,6 +1,6 @@
--- BDR Projet
+-- BDR Projet Chillout
 -- Auteur:  Alen Bijelic, Mélissa Gehring, Yanik Lange
--- Date:    07.12.2021
+-- Date:    22.12.2021
 
 set client_encoding to 'utf8';
 
@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS Boisson CASCADE;
 CREATE TABLE Boisson (
     id SMALLSERIAL,
     nom VARCHAR(80) NOT NULL,
-    contenance SMALLINT NOT NULL,
+    contenance SMALLINT NOT NULL CHECK (contenance > 0),
     disponibilité BOOLEAN NOT NULL DEFAULT TRUE,
     CONSTRAINT PK_Boisson PRIMARY KEY (id)
 );
@@ -20,8 +20,8 @@ CREATE TABLE Boisson (
 DROP TABLE IF EXISTS BoissonAlcoolisée CASCADE;
 CREATE TABLE BoissonAlcoolisée (
     idBoisson SMALLINT,
-    tauxAlcool DECIMAL(3,1) NOT NULL,
-    ageMin SMALLINT NOT NULL,
+    tauxAlcool DECIMAL(3,1) NOT NULL CHECK (tauxAlcool >= 0),
+    ageMin SMALLINT NOT NULL CHECK (ageMin > 0 AND ageMin < 150),
     pays VARCHAR(80) NOT NULL,
     région VARCHAR(80) NOT NULL,
     CONSTRAINT PK_BoissonAlcoolisée PRIMARY KEY (idBoisson)
@@ -55,7 +55,7 @@ CREATE TYPE TypeVin AS ENUM ('Rouge', 'Blanc', 'Rosé');
 CREATE TABLE Vin (
     idBoissonAlcoolisée SMALLINT,
     type TypeVin NOT NULL,
-    année SMALLINT NOT NULL,
+    année SMALLINT NOT NULL CHECK (année > 1500),
     CONSTRAINT PK_Vin PRIMARY KEY (idBoissonAlcoolisée)
 );
 /*-------------------------------------------*/
@@ -64,7 +64,7 @@ CREATE TABLE Vin (
 DROP TABLE IF EXISTS Stock CASCADE;
 CREATE TABLE Stock (
     idBoisson SMALLINT,
-    datePéremption DATE,
+    datePéremption DATE CHECK (datePéremption >= current_date - interval '1 month'),
     CONSTRAINT PK_Stock PRIMARY KEY (idBoisson, datePéremption)
 );
 /*-------------------------------------------*/
@@ -74,7 +74,7 @@ DROP TABLE IF EXISTS StockFournisseur CASCADE;
 CREATE TABLE StockFournisseur (
     idBoissonStock SMALLINT,
     datePéremptionStock DATE,
-    quantité SMALLINT NOT NULL,
+    quantité SMALLINT NOT NULL CHECK (quantité > 0),
     nomFournisseur VARCHAR(80) NOT NULL,
     CONSTRAINT PK_StockFournisseur PRIMARY KEY (idBoissonStock, datePéremptionStock)
 );
@@ -85,7 +85,7 @@ DROP TABLE IF EXISTS StockChillout CASCADE;
 CREATE TABLE StockChillout (
     idBoissonStock SMALLINT,
     datePéremptionStock DATE,
-    prixDeVente DECIMAL(8,2) NOT NULL,
+    prixDeVente DECIMAL(8,2) NOT NULL CHECK (prixDeVente > 0),
     CONSTRAINT PK_StockChillout PRIMARY KEY (idBoissonStock, datePéremptionStock)
 );
 /*-------------------------------------------*/
@@ -95,10 +95,10 @@ DROP TABLE IF EXISTS Fournisseur CASCADE;
 CREATE TABLE Fournisseur (
     nom VARCHAR(80),
     nomRue VARCHAR(80) NOT NULL,
-    numRue SMALLINT NOT NULL,
-    codePostal SMALLINT NOT NULL,
+    numRue SMALLINT NOT NULL CHECK (numRue > 0),
+    codePostal SMALLINT NOT NULL CHECK (codePostal > 0),
     localité VARCHAR(80) NOT NULL,
-    fraisLivraison DECIMAL(8, 2) NOT NULL,
+    fraisLivraison DECIMAL(8, 2) NOT NULL CHECK (fraisLivraison >= 0),
     CONSTRAINT PK_Fournisseur PRIMARY KEY (nom)
 );
 /*-------------------------------------------*/
@@ -108,7 +108,7 @@ DROP TABLE IF EXISTS Boisson_Fournisseur CASCADE;
 CREATE TABLE Boisson_Fournisseur (
     idBoisson SMALLINT,
     nomFournisseur VARCHAR(80),
-    prixUnitaire DECIMAL(8, 2) NOT NULL,
+    prixUnitaire DECIMAL(8, 2) NOT NULL CHECK (prixUnitaire > 0),
     CONSTRAINT PK_Boisson_Fournisseur PRIMARY KEY (idBoisson, nomFournisseur)
 );
 /*-------------------------------------------*/
@@ -120,7 +120,7 @@ CREATE TABLE Personne (
     nom VARCHAR(80) NOT NULL,
     prénom VARCHAR(80) NOT NULL,
     dateNaissance DATE NOT NULL,
-    dateArrivée DATE NOT NULL,
+    dateArrivée DATE NOT NULL CHECK (dateArrivée > dateNaissance),
     actif BOOLEAN NOT NULL DEFAULT TRUE,
     CONSTRAINT PK_Personne PRIMARY KEY (id)
 );
@@ -156,7 +156,7 @@ DROP TABLE IF EXISTS Evaluation CASCADE;
 CREATE TABLE Evaluation (
     idBoisson SMALLINT,
     idMembre SMALLINT,
-    note SMALLINT NOT NULL,
+    note SMALLINT NOT NULL CHECK (note >= 1 AND note <= 5),
     date DATE NOT NULL,
     CONSTRAINT PK_Evaluation PRIMARY KEY (idBoisson, idMembre)
 );
@@ -168,7 +168,6 @@ CREATE TABLE Commande (
     id SMALLSERIAL,
     dateHeure DATE NOT NULL,
     idPersonne SMALLINT NOT NULL,
-    quantité SMALLINT NOT NULL,
     CONSTRAINT PK_Commande PRIMARY KEY (id)
 );
 /*-------------------------------------------*/
@@ -179,6 +178,7 @@ CREATE TABLE Commande_Stock (
     idCommande SMALLINT,
     idBoissonStock SMALLINT,
     datePéremptionStock DATE,
+    quantité SMALLINT NOT NULL CHECK (quantité > 0),
     CONSTRAINT PK_Commande_Stock PRIMARY KEY (idCommande, idBoissonStock, datePéremptionStock)
 );
 
