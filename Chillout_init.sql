@@ -168,6 +168,7 @@ CREATE TABLE Commande (
     id SMALLSERIAL,
     dateHeure DATE NOT NULL,
     idPersonne SMALLINT NOT NULL,
+	commandeFournisseur BOOLEAN NOT NULL,
     CONSTRAINT PK_Commande PRIMARY KEY (id)
 );
 /*-------------------------------------------*/
@@ -220,22 +221,26 @@ CREATE INDEX IDX_FK_Commande_Stock_idBoissonStock_datePéremptionStock ON Comman
 ALTER TABLE BoissonAlcoolisée 
     ADD CONSTRAINT FK_BoissonAlcoolisée_idBoisson
         FOREIGN KEY (idBoisson)
-            REFERENCES Boisson (id);
+            REFERENCES Boisson (id)
+ON UPDATE CASCADE;
 /*-------------------------------------------*/
 ALTER TABLE BoissonSoft
     ADD CONSTRAINT FK_BoissonSoft_idBoisson
         FOREIGN KEY (idBoisson)
-            REFERENCES Boisson (id);
+            REFERENCES Boisson (id)
+ON UPDATE CASCADE;
 /*-------------------------------------------*/
 ALTER TABLE Bière
     ADD CONSTRAINT FK_Bière_idBoissonAlcoolisée
         FOREIGN KEY (idBoissonAlcoolisée)       
-            REFERENCES BoissonAlcoolisée (idBoisson);
+            REFERENCES BoissonAlcoolisée (idBoisson)
+ON UPDATE CASCADE;
 /*-------------------------------------------*/
 ALTER TABLE Vin
     ADD CONSTRAINT FK_Vin_idBoissonAlcoolisée
         FOREIGN KEY (idBoissonAlcoolisée)
-            REFERENCES BoissonAlcoolisée (idBoisson);
+            REFERENCES BoissonAlcoolisée (idBoisson)
+ON UPDATE CASCADE;
 /*-------------------------------------------*/
 ALTER TABLE Stock
     ADD CONSTRAINT FK_Stock_idBoisson
