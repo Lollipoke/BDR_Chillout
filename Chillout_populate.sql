@@ -258,6 +258,8 @@ INSERT INTO Stock (idBoisson, datePéremption) VALUES (18, '02.01.2022');
 INSERT INTO StockChillout (idBoissonStock, datePéremptionStock, prixDeVente) VALUES (1, '13.02.2023', 1.5);
 INSERT INTO StockChillout (idBoissonStock, datePéremptionStock, prixDeVente) VALUES (1, '14.02.2023', 1.5);
 INSERT INTO StockChillout (idBoissonStock, datePéremptionStock, prixDeVente) VALUES (2, '13.02.2023', 1.5);
+/*INSERT INTO StockChillout (idBoissonStock, datePéremptionStock, prixDeVente) VALUES (3, '12.01.2022', 1.5);*/ 
+/* pas dispo au chillout mais dispo chez fournisseur */
 INSERT INTO StockChillout (idBoissonStock, datePéremptionStock, prixDeVente) VALUES (4, '18.02.2023', 1.6);
 INSERT INTO StockChillout (idBoissonStock, datePéremptionStock, prixDeVente) VALUES (5, '12.01.2023', 4.2);
 INSERT INTO StockChillout (idBoissonStock, datePéremptionStock, prixDeVente) VALUES (5, '12.01.2022', 3.7);
