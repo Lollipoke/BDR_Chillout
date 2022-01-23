@@ -24,27 +24,26 @@ CREATE OR REPLACE FUNCTION check_disponibilité_boisson() RETURNS TRIGGER
 LANGUAGE plpgsql
 AS 
 $BODY$
-	DECLARE	
-		quantiteChill integer;
-		quantiteCommande integer;
+	DECLARE
+		quantitee smallint;
 	BEGIN
-		SELECT vQuantitéStockChillout.quantité into quantiteChill
+	SELECT vQuantitéStockChillout.quantité INTO quantitee
 		FROM vQuantitéStockChillout;
-	    /*SELECT Commande_Stock.quantité into quantiteCommande
-		FROM Commande_Stock;*/
-		IF (quantiteChill >= quantiteCommande) THEN
-			--RAISE EXCEPTION 'Not enough stock';
+	    --WHERE vQuantitéStockChillout.id = NEW.idBoissonStock;
+		raise notice 'Value: %', NEW.quantité;
+		raise notice 'Value: %', quantitee; -- problem found : quantitee is null [WIP]
+		IF (quantitee >= NEW.quantité) THEN
 			INSERT INTO Commande_Stock(idCommande, idBoissonStock, datePéremptionStock, quantité)
 				VALUES (NEW.idCommande, NEW.idBoissonStock, NEW.datePéremptionStock, New.quantité);
-		ELSIF (quantiteChill <= quantiteCommande) THEN
-			--RAISE EXCEPTION 'Not enough stock';
+		ELSIF (quantitee < NEW.quantité) THEN
+			RAISE EXCEPTION 'Not enough stock';
 		END IF;
  		RETURN NULL;
 	END;
 $BODY$;
 
 CREATE OR REPLACE TRIGGER check_before_insert_or_update_commande_stock
-BEFORE INSERT OR UPDATE 
+BEFORE INSERT 
 ON Commande_Stock
 FOR EACH ROW
 EXECUTE FUNCTION check_disponibilité_boisson();
