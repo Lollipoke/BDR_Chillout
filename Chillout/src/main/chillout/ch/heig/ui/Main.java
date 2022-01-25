@@ -12,6 +12,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import static java.lang.Integer.parseInt;
@@ -21,6 +22,7 @@ public final class Main extends Application {
     private static String dbName;
     private static String user;
     private static String mdp;
+    private Stage primaryStage;
 
     public static void main(String[] args) {
         if(args.length != 3) {
@@ -34,6 +36,7 @@ public final class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        this.primaryStage = primaryStage;
         Pane welcomePane = createTitlePane();
         Pane loginChoices = createLoginPane();
 
@@ -124,11 +127,16 @@ public final class Main extends Application {
                 if (staffValid && membreValid) {
                     setLoggedInUserChoice(nom);
                     stage.close(); // return to main window
-                } else if (staffValid || membreValid) {
-                    setLoggedInUser(nom, staffValid ? "staff" : "membre");
+                } else if (staffValid) {
+                    setLoggedInUser(nom,"staff");
                     stage.close(); // return to main window
+                    primaryStage.setScene(StaffUI.createStaffWindow(nom));
+                } else if(membreValid) {
+                    setLoggedInUser(nom, "membre");
+                    stage.close(); // return to main window
+                    primaryStage.setScene(MembreUI.createMembreWindow(nom));
                 } else {
-                    setLogginInvalid(nom, id);
+                    setLoggingInvalid(nom, id);
                 }
             }
         });
@@ -162,10 +170,17 @@ public final class Main extends Application {
         choiceDialog.setContentText(s);
         choiceDialog.getButtonTypes().setAll(membreButton, staffButton);
         Optional<ButtonType> choice = choiceDialog.showAndWait();
-        choice.ifPresent(e -> System.out.println(e.getText()));
+        choice.ifPresent(e -> {
+            if(Objects.equals(e.getText(), "Staff")) {
+                primaryStage.setScene(StaffUI.createStaffWindow(nom));
+            } else {
+
+                primaryStage.setScene(MembreUI.createMembreWindow(nom));
+            }
+        });
     }
 
-    private void setLogginInvalid(String nom, int id) {
+    private void setLoggingInvalid(String nom, int id) {
         Alert alert = new Alert(AlertType.INFORMATION);
         alert.setTitle("Connection invalide");
         alert.setHeaderText("Erreur !");
