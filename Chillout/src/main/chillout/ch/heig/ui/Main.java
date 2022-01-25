@@ -1,50 +1,32 @@
 package ch.heig.ui;
 
+import ch.heig.db.DBConnection;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.util.Optional;
+
+import static java.lang.Integer.parseInt;
+
 public final class Main extends Application {
-    private String loggedInUser;
+    private DBConnection db;
+
     public static void main(String[] args) {
         launch(args);
     }
 
     @Override
-    public void start(Stage primaryStage) {TilePane welcomePane = new TilePane();
-        welcomePane.setPadding(new Insets(10, 10, 10, 10));
-        welcomePane.setPrefColumns(2);
-        HBox hbox2 = new HBox(20); // spacing = 8
-        Text welcomeText = new Text();
-        welcomeText.setFont(new Font(30));
-        welcomeText.setText("Bienvenue sur l'application du Chillout !");
-        hbox2.getChildren().addAll(welcomeText);
-        welcomePane.setStyle("-fx-background-color: #9FDFC8;");
-        welcomePane.getChildren().add(hbox2);
-
-        TilePane loginChoices = new TilePane();
-        Text loginText = new Text();
-        loginText.setFont(new Font(12));
-        loginText.setStyle("-fx-padding: 15px; -fx-alignment: left;");
-        loginText.setText("Veuillez vous loger pour utiliser l'application : ");
-        Button btnLogin = new Button();
-        btnLogin.setText("Login");
-        btnLogin.setOnAction(event -> showLoginScreen());
-        loginChoices.getChildren().add(loginText);
-        loginChoices.getChildren().add(btnLogin);
-        loginChoices.setStyle("-fx-padding: 30px;");
+    public void start(Stage primaryStage) {
+        Pane welcomePane = createTitlePane();
+        Pane loginChoices = createLoginPane();
 
         // A layout container for UI controls
         BorderPane mainStack = new BorderPane();
@@ -57,18 +39,44 @@ public final class Main extends Application {
         // primaryStage is the main top level window created by platform
         primaryStage.setTitle("Chillout App");
         primaryStage.setScene(scene);
+        primaryStage.setResizable(false);
         primaryStage.show();
+
+        // Start DB connexion
+        db = new DBConnection();
     }
 
-    public void setLoggedInUser(String user) {
-        loggedInUser = user;
+    private Pane createTitlePane() {
+        TilePane welcomePane = new TilePane();
+        welcomePane.setPadding(new Insets(10, 10, 10, 10));
+        welcomePane.setPrefColumns(2);
+        HBox hbox2 = new HBox(20); // spacing = 8
+        Text welcomeText = new Text();
+        welcomeText.setFont(new Font(30));
+        welcomeText.setText("Bienvenue sur l'application du Chillout !");
+        hbox2.getChildren().addAll(welcomeText);
+        welcomePane.setStyle("-fx-background-color: #9FDFC8;");
+        welcomePane.getChildren().add(hbox2);
+        return welcomePane;
+    }
 
-        Alert alert = new Alert(AlertType.INFORMATION);
-        alert.setTitle("Successful login");
-        alert.setHeaderText("Successful login");
-        String s = user + " logged in!";
-        alert.setContentText(s);
-        alert.show();
+    private Pane createLoginPane() {
+        TilePane loginChoices = new TilePane();
+        Text loginText = new Text();
+        loginText.setFont(new Font(20));
+        loginText.setStyle("-fx-padding: 30px; -fx-alignment: center;");
+        loginText.setText("Veuillez vous loger pour utiliser l'application : ");
+        Button btnLogin = new Button();
+        btnLogin.setText("Login");
+        btnLogin.setOnAction(event -> showLoginScreen());
+        VBox vbox = new VBox(20);
+        vbox.setAlignment(Pos.CENTER);
+        vbox.getChildren().add(loginText);
+        vbox.getChildren().add(btnLogin);
+        loginChoices.getChildren().add(vbox);
+        loginChoices.setStyle("-fx-padding: 30px;");
+        loginChoices.setAlignment(Pos.CENTER);
+        return loginChoices;
     }
 
     public void showLoginScreen() {
@@ -91,9 +99,29 @@ public final class Main extends Application {
         btnLogin.setText("Login");
 
         btnLogin.setOnAction(event -> {
-            // Assume success always!
-            setLoggedInUser(textUser.getText());
-            stage.close(); // return to main window
+            String nom = textUser.getText();
+            int id = 0;
+            try {
+                id = parseInt(textPass.getText());
+            } catch (NumberFormatException e) {
+                System.out.println(e.getMessage());
+            }
+
+            if (nom != null && id > 0) {
+                boolean staffValid = db.getStaffLoginValidity(nom, id);
+                boolean membreValid = db.getMembreLoginValidity(nom, id);
+                System.out.println(staffValid);
+                System.out.println(membreValid);
+                if (staffValid && membreValid) {
+                    setLoggedInUserChoice(nom);
+                    stage.close(); // return to main window
+                } else if (staffValid || membreValid) {
+                    setLoggedInUser(nom, staffValid ? "staff" : "membre");
+                    stage.close(); // return to main window
+                } else {
+                    setLogginInvalid(nom, id);
+                }
+            }
         });
 
         box.getChildren().add(label);
@@ -102,6 +130,39 @@ public final class Main extends Application {
         box.getChildren().add(btnLogin);
         Scene scene = new Scene(box, 250, 150);
         stage.setScene(scene);
+        stage.setResizable(false);
         stage.show();
     }
+
+    private void setLoggedInUser(String nom, String category) {
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle("Connection valide");
+        alert.setHeaderText("Bienvenue !");
+        String s = nom + ", vous êtes connecté en tant que " + category;
+        alert.setContentText(s);
+        alert.show();
+    }
+
+    public void setLoggedInUserChoice(String nom) {
+        ButtonType membreButton = new ButtonType("Membre");
+        ButtonType staffButton = new ButtonType("Staff");
+        Alert choiceDialog = new Alert(AlertType.CONFIRMATION);
+        choiceDialog.setTitle("Connection valide");
+        choiceDialog.setHeaderText("Bienvenue " + nom + "!\nVeuillez choisir votre mode de connexion.");
+        String s = "Choix : ";
+        choiceDialog.setContentText(s);
+        choiceDialog.getButtonTypes().setAll(membreButton, staffButton);
+        Optional<ButtonType> choice = choiceDialog.showAndWait();
+        choice.ifPresent(e -> System.out.println(e.getText()));
+    }
+
+    private void setLogginInvalid(String nom, int id) {
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle("Connection invalide");
+        alert.setHeaderText("Erreur !");
+        String s = "Impossible de trouver : " + nom + ", " + id;
+        alert.setContentText(s);
+        alert.show();
+    }
+
 }
