@@ -4,22 +4,27 @@ import java.sql.*;
 
 public class DBConnection {
     private static final String URL =
-            "jdbc:postgresql://localhost/chillout"; // chillout = le nom de la base
-    private static final String USR = "postgres";
-    private static final String PASSWORD = "2755"; // Remplacer ici par le mdp
+            "jdbc:postgresql://localhost/"; // chillout = le nom de la base
+    private final String dbName;
+    private final String usr;
+    private final String pwd;
     private final Connection connection;
 
-    public DBConnection() {
+    public DBConnection(String dbName, String user, String mdp) {
+        this.dbName = dbName;
+        this.usr = user;
+        this.pwd = mdp;
         this.connection = connect();
     }
 
     private Connection connect() {
         Connection conn = null;
         try {
-            conn = DriverManager.getConnection(URL, USR, PASSWORD);
+            conn = DriverManager.getConnection(URL+dbName, usr, pwd);
             System.out.println("Connected to the PostgreSQL server successfully.");
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+            System.exit(1);
         }
 
         return conn;

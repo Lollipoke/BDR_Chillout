@@ -18,8 +18,17 @@ import static java.lang.Integer.parseInt;
 
 public final class Main extends Application {
     private DBConnection db;
+    private static String dbName;
+    private static String user;
+    private static String mdp;
 
     public static void main(String[] args) {
+        if(args.length != 3) {
+            throw new RuntimeException("Besoin de 2 arguments : <nom bd> <user> <mdp>.");
+        }
+        dbName = args[0];
+        user = args[1];
+        mdp = args[2];
         launch(args);
     }
 
@@ -43,7 +52,7 @@ public final class Main extends Application {
         primaryStage.show();
 
         // Start DB connexion
-        db = new DBConnection();
+        db = new DBConnection(dbName, user, mdp);
     }
 
     private Pane createTitlePane() {
@@ -65,7 +74,7 @@ public final class Main extends Application {
         Text loginText = new Text();
         loginText.setFont(new Font(20));
         loginText.setStyle("-fx-padding: 30px; -fx-alignment: center;");
-        loginText.setText("Veuillez vous loger pour utiliser l'application : ");
+        loginText.setText("Veuillez vous logger pour utiliser l'application : ");
         Button btnLogin = new Button();
         btnLogin.setText("Login");
         btnLogin.setOnAction(event -> showLoginScreen());
