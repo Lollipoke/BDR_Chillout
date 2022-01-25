@@ -1,3 +1,5 @@
+package ch.heig;
+
 import java.sql.*;
 
 public class App {
