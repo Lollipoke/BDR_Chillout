@@ -122,17 +122,13 @@ public final class Main extends Application {
             if (nom != null && id > 0) {
                 boolean staffValid = db.getStaffLoginValidity(nom, id);
                 boolean membreValid = db.getMembreLoginValidity(nom, id);
-                System.out.println(staffValid);
-                System.out.println(membreValid);
                 if (staffValid && membreValid) {
                     setLoggedInUserChoice(nom);
                     stage.close(); // return to main window
                 } else if (staffValid) {
-                    setLoggedInUser(nom,"staff");
                     stage.close(); // return to main window
                     primaryStage.setScene(StaffUI.createStaffWindow(nom));
                 } else if(membreValid) {
-                    setLoggedInUser(nom, "membre");
                     stage.close(); // return to main window
                     primaryStage.setScene(MembreUI.createMembreWindow(nom));
                 } else {
@@ -149,15 +145,6 @@ public final class Main extends Application {
         stage.setScene(scene);
         stage.setResizable(false);
         stage.show();
-    }
-
-    private void setLoggedInUser(String nom, String category) {
-        Alert alert = new Alert(AlertType.INFORMATION);
-        alert.setTitle("Connection valide");
-        alert.setHeaderText("Bienvenue !");
-        String s = nom + ", vous êtes connecté en tant que " + category;
-        alert.setContentText(s);
-        alert.show();
     }
 
     public void setLoggedInUserChoice(String nom) {
