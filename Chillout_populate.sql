@@ -80,7 +80,7 @@ INSERT INTO Bière (idBoissonAlcoolisée, type) VALUES (13, 'Stout');
 
 /*================ Vin ====================*/
 
-INSERT INTO Vin (idBoissonAlcoolisée, type, année) VALUES (14, 'Blanc', 2011);
+INSERT INTO Vin (idBoissonAlcoolisée, type, année) VALUES (14, 'Blanc', 2022);
 INSERT INTO Vin (idBoissonAlcoolisée, type, année) VALUES (15, 'Rosé', 2011);
 INSERT INTO Vin (idBoissonAlcoolisée, type, année) VALUES (16, 'Blanc', 2013);
 INSERT INTO Vin (idBoissonAlcoolisée, type, année) VALUES (17, 'Rouge', 1983);
@@ -143,13 +143,14 @@ INSERT INTO Staff (idPersonne) VALUES (7);
 
 /*================ Evaluation ====================*/
 /* TODO check les dates d'évaluations avec dateArrivée des Membres */
-INSERT INTO Evaluation (idBoisson, idMembre, note, date) VALUES (1, 1, 4, '2021-03-13');
-INSERT INTO Evaluation (idBoisson, idMembre, note, date) VALUES (1, 2, 4, '2021-03-13');
-INSERT INTO Evaluation (idBoisson, idMembre, note, date) VALUES (5, 2, 5, '2021-03-13');
-INSERT INTO Evaluation (idBoisson, idMembre, note, date) VALUES (1, 3, 4, '2018-07-11');
-INSERT INTO Evaluation (idBoisson, idMembre, note, date) VALUES (1, 4, 4, '2019-04-11');
-INSERT INTO Evaluation (idBoisson, idMembre, note, date) VALUES (5, 4, 5, '2021-03-13');
-INSERT INTO Evaluation (idBoisson, idMembre, note, date) VALUES (1, 5, 4, '2018-09-01');
+/* TODO il faut que la date de Evaluation soit la date courrente sinon le check ne permet pas d'insérer l'évaluation */
+INSERT INTO Evaluation (idBoisson, idMembre, note, date) VALUES (1, 1, 4, CURRENT_DATE);
+INSERT INTO Evaluation (idBoisson, idMembre, note, date) VALUES (1, 2, 4, CURRENT_DATE);
+INSERT INTO Evaluation (idBoisson, idMembre, note, date) VALUES (5, 2, 5, CURRENT_DATE);
+INSERT INTO Evaluation (idBoisson, idMembre, note, date) VALUES (1, 3, 4, CURRENT_DATE);
+INSERT INTO Evaluation (idBoisson, idMembre, note, date) VALUES (1, 4, 4, CURRENT_DATE);
+INSERT INTO Evaluation (idBoisson, idMembre, note, date) VALUES (5, 4, 5, CURRENT_DATE);
+/*INSERT INTO Evaluation (idBoisson, idMembre, note, date) VALUES (1, 5, 4, '2022-01-25');*/ /*valeur hors date pour tester le check */
 /*INSERT INTO Evaluation(1, 6, 4, '2019-04-10');*/ /* Membre actif qui n'a pas noté */
 
 

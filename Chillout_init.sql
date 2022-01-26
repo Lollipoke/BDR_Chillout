@@ -55,7 +55,7 @@ CREATE TYPE TypeVin AS ENUM ('Rouge', 'Blanc', 'Rosé');
 CREATE TABLE Vin (
     idBoissonAlcoolisée SMALLINT,
     type TypeVin NOT NULL,
-    année SMALLINT NOT NULL CHECK (année > 1500),
+    année SMALLINT NOT NULL CHECK (année > 1500 AND année <= CAST(EXTRACT(YEAR FROM CURRENT_TIMESTAMP) AS SMALLINT)),
     CONSTRAINT PK_Vin PRIMARY KEY (idBoissonAlcoolisée)
 );
 /*-------------------------------------------*/
@@ -157,7 +157,7 @@ CREATE TABLE Evaluation (
     idBoisson SMALLINT,
     idMembre SMALLINT,
     note SMALLINT NOT NULL CHECK (note >= 1 AND note <= 5),
-    date DATE NOT NULL,
+    date DATE NOT NULL CHECK (date = CURRENT_DATE),
     CONSTRAINT PK_Evaluation PRIMARY KEY (idBoisson, idMembre)
 );
 /*-------------------------------------------*/
