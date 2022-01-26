@@ -1,5 +1,6 @@
 package ch.heig.ui;
 
+import ch.heig.data.Personne;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -9,8 +10,8 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 public class StaffUI {
-    public static Scene createStaffWindow(String name) {
-        Pane titlePane = createTitlePane(name);
+    public static Scene createStaffWindow(Personne p) {
+        Pane titlePane = createTitlePane(p.getPrénom() + " " + p.getNom());
         Pane staffPane = createStaffPane();
 
         // A layout container for UI controls
@@ -29,7 +30,7 @@ public class StaffUI {
         HBox hbox2 = new HBox(20); // spacing = 8
         Text welcomeText = new Text();
         welcomeText.setFont(new Font(30));
-        welcomeText.setText("Bienvenue " + name + " dans l'espace Staff!");
+        welcomeText.setText("Bienvenue " + name + " dans l'espace staff !");
         hbox2.getChildren().addAll(welcomeText);
         welcomePane.setStyle("-fx-background-color: #9FDFC8;");
         welcomePane.getChildren().add(hbox2);

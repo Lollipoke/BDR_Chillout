@@ -1,18 +1,18 @@
 package ch.heig.ui;
 
 import ch.heig.App;
-import ch.heig.data.Biere;
-import ch.heig.data.BoissonSoft;
-import ch.heig.data.Vin;
+import ch.heig.data.*;
 import ch.heig.db.DBConnection;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -22,9 +22,9 @@ import javafx.util.Callback;
 import java.util.List;
 
 public class MembreUI {
-    public static Scene createMembreWindow(String name, DBConnection db) {
-        Pane titlePane = createTitlePane(name);
-        Pane membrePane = createMembrePane(db);
+    public static Scene createMembreWindow(Personne p, DBConnection db) {
+        Pane titlePane = createTitlePane(p.getPrénom() + " " + p.getNom());
+        Pane membrePane = createMembrePane(db, p);
 
         // A layout container for UI controls
         BorderPane mainStack = new BorderPane();
@@ -42,14 +42,14 @@ public class MembreUI {
         HBox hbox2 = new HBox(20); // spacing = 8
         Text welcomeText = new Text();
         welcomeText.setFont(new Font(30));
-        welcomeText.setText("Bienvenue " + name + " dans l'espace Membre!");
+        welcomeText.setText("Bienvenue " + name + " dans l'espace membre !");
         hbox2.getChildren().addAll(welcomeText);
         welcomePane.setStyle("-fx-background-color: #9FDFC8;");
         welcomePane.getChildren().add(hbox2);
         return welcomePane;
     }
 
-    private static Pane createMembrePane(DBConnection db) {
+    private static Pane createMembrePane(DBConnection db, Personne p) {
         TilePane loginChoices = new TilePane();
 
         Text getBoissonsText = new Text();
@@ -69,7 +69,7 @@ public class MembreUI {
         getStatisticsText.setText("Statistiques du membre : ");
         Button getStatisticsBtn = new Button();
         getStatisticsBtn.setText("Statistiques");
-        getStatisticsBtn.setOnAction(event -> showStatisticsWindow());
+        getStatisticsBtn.setOnAction(event -> showStatisticsWindow(db, p));
         HBox hBoxStatistics = new HBox(10);
         hBoxStatistics.getChildren().add(getStatisticsText);
         hBoxStatistics.getChildren().add(getStatisticsBtn);
@@ -80,7 +80,7 @@ public class MembreUI {
         getCommandesText.setText("Liste des commandes du membre : ");
         Button getCommandesBtn = new Button();
         getCommandesBtn.setText("Commandes");
-        getCommandesBtn.setOnAction(event -> showCommandesWindow());
+        getCommandesBtn.setOnAction(event -> showCommandesWindow(db, p));
         HBox hBoxCommandes = new HBox(10);
         hBoxCommandes.getChildren().add(getCommandesText);
         hBoxCommandes.getChildren().add(getCommandesBtn);
@@ -138,7 +138,7 @@ public class MembreUI {
 
         Scene scene = new Scene(box, 1000, 700);
         stage.setScene(scene);
-        stage.setTitle("Boissons proposées par le Chillout.");
+        stage.setTitle("Boissons proposées par le Chillout");
         stage.setResizable(false);
         stage.show();
     }
@@ -234,11 +234,100 @@ public class MembreUI {
     }
 
 
-    private static void showStatisticsWindow() {
+    private static void showStatisticsWindow(DBConnection db, Personne p) {
 
     }
 
-    private static void showCommandesWindow() {
+    private static void showCommandesWindow(DBConnection db, Personne p) {
+        List<Commande> commandes = db.getCommandes(p, false);
 
+        ObservableList<Commande> commandesObservableList = FXCollections.observableArrayList(commandes);
+
+        //ObservableList<BoissonStockee> boissonStockeesObservableList = FXCollections.observableList(commandes)
+        ListView<Commande> commandesListView = createCommandesListView(commandesObservableList);
+
+        ObservableList<BoissonStockee> boissonStockes = FXCollections.observableArrayList();
+        TableView<BoissonStockee> boissonStockeeTableView = createBoissonsCommandesTableView(boissonStockes);
+
+
+        Stage stage = new Stage();
+        GridPane gridpane = new GridPane();
+
+        Label labelCommandes = new Label("Commandes :");
+        labelCommandes.setFont(new Font(20));
+        Label labelBoissons = new Label("Boissons :");
+        labelBoissons.setFont(new Font(20));
+
+        GridPane.setHalignment(labelCommandes, HPos.CENTER);
+        gridpane.add(labelCommandes, 0, 0);
+        gridpane.add(commandesListView, 0, 1);
+
+        GridPane.setHalignment(labelBoissons, HPos.CENTER);
+        gridpane.add(labelBoissons, 2, 0);
+        gridpane.add(boissonStockeeTableView, 2, 1);
+
+        commandesListView
+                .getSelectionModel()
+                .selectedItemProperty()
+                .addListener((observable, oldValue, newValue) -> {
+                    if (observable != null && observable.getValue() != null) {
+                        boissonStockes.clear();
+                        boissonStockes.addAll(observable.getValue().getBoissonsStockées().keySet());
+                    }
+                });
+
+        Scene scene = new Scene(gridpane, 1000, 700);
+        stage.setScene(scene);
+        stage.setTitle("Commandes passées par le membre");
+        stage.setResizable(false);
+        stage.show();
     }
+
+    private static TableView<BoissonStockee> createBoissonsCommandesTableView(ObservableList<BoissonStockee> boissonStockees) {
+        TableView<BoissonStockee> boissonsCommandéesTableView = new TableView<>();
+
+        boissonsCommandéesTableView.setItems(boissonStockees);
+
+        TableColumn<BoissonStockee, String> idCol = new TableColumn<>("Id");
+        TableColumn<BoissonStockee, String> nomCol = new TableColumn<>("Nom");
+        TableColumn<BoissonStockee, String> contenanceCol = new TableColumn<>("Contenance");
+        TableColumn<BoissonStockee, String> disponibilitéCol = new TableColumn<>("Disponibilité");
+        TableColumn<BoissonStockee, String> datePéremptionCol = new TableColumn<>("Date Péremption");
+
+        idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+        nomCol.setCellValueFactory(new PropertyValueFactory<>("nom"));
+        contenanceCol.setCellValueFactory(new PropertyValueFactory<>("contenance"));
+        disponibilitéCol.setCellValueFactory(new PropertyValueFactory<>("disponibilité"));
+        datePéremptionCol.setCellValueFactory(new PropertyValueFactory<>("datePéremption"));
+
+        boissonsCommandéesTableView.getColumns().setAll(idCol, nomCol, contenanceCol, disponibilitéCol, datePéremptionCol);
+
+        return boissonsCommandéesTableView;
+    }
+
+    private static ListView<Commande> createCommandesListView(ObservableList<Commande> commandes) {
+        ListView<Commande> commandesListView = new ListView<>(commandes);
+        commandesListView.setPrefWidth(150);
+        commandesListView.setMaxWidth(Double.MAX_VALUE);
+        commandesListView.setPrefHeight(150);
+
+        commandesListView.setCellFactory(new Callback<>() {
+            @Override
+            public ListCell<Commande> call(ListView<Commande> param) {
+                ListCell<Commande> cell = new ListCell<Commande>() {
+                    @Override
+                    public void updateItem(Commande item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item != null) {
+                            setText(item.getId() + " " + item.getDateHeure());
+                        }
+                    }
+                };
+                return cell;
+            }
+
+        });
+        return commandesListView;
+    }
+
 }

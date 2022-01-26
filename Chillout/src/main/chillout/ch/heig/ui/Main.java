@@ -123,14 +123,14 @@ public final class Main extends Application {
                 boolean staffValid = db.getStaffLoginValidity(nom, id);
                 boolean membreValid = db.getMembreLoginValidity(nom, id);
                 if (staffValid && membreValid) {
-                    setLoggedInUserChoice(nom);
+                    setLoggedInUserChoice(nom, id);
                     stage.close(); // return to main window
                 } else if (staffValid) {
                     stage.close(); // return to main window
-                    primaryStage.setScene(StaffUI.createStaffWindow(nom));
+                    primaryStage.setScene(StaffUI.createStaffWindow(db.getPersonne(id, false)));
                 } else if(membreValid) {
                     stage.close(); // return to main window
-                    primaryStage.setScene(MembreUI.createMembreWindow(nom, db));
+                    primaryStage.setScene(MembreUI.createMembreWindow(db.getPersonne(id, true), db));
                 } else {
                     setLoggingInvalid(nom, id);
                 }
@@ -147,7 +147,7 @@ public final class Main extends Application {
         stage.show();
     }
 
-    public void setLoggedInUserChoice(String nom) {
+    public void setLoggedInUserChoice(String nom, int id) {
         ButtonType membreButton = new ButtonType("Membre");
         ButtonType staffButton = new ButtonType("Staff");
         Alert choiceDialog = new Alert(AlertType.CONFIRMATION);
@@ -159,10 +159,10 @@ public final class Main extends Application {
         Optional<ButtonType> choice = choiceDialog.showAndWait();
         choice.ifPresent(e -> {
             if(Objects.equals(e.getText(), "Staff")) {
-                primaryStage.setScene(StaffUI.createStaffWindow(nom));
+                primaryStage.setScene(StaffUI.createStaffWindow(db.getPersonne(id, false)));
             } else {
 
-                primaryStage.setScene(MembreUI.createMembreWindow(nom, db));
+                primaryStage.setScene(MembreUI.createMembreWindow(db.getPersonne(id, true), db));
             }
         });
     }
