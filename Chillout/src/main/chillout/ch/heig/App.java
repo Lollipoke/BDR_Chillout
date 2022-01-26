@@ -1,43 +1,190 @@
 package ch.heig;
 
-import java.sql.*;
+import javafx.application.Application;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import javafx.util.Callback;
 
-public class App {
-    private static final String URL =
-            "jdbc:postgresql://localhost/chillout"; // chillout = le nom de la base
-    private static final String USR = "postgres";
-    private static final String PASSWORD = ""; // Remplacer ici par le mdp
+/**
+ * @web http://java-buddy.blogspot.com/
+ */
+public class App extends Application {
 
-    public static void main(String[] args) {
-        App app = new App();
-        app.getBoissons();
-    }
+    public static class Record {
 
-    private Connection connect() {
-        Connection conn = null;
-        try {
-            conn = DriverManager.getConnection(URL, USR, PASSWORD);
-            System.out.println("Connected to the PostgreSQL server successfully.");
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+        private final SimpleIntegerProperty id;
+        private final SimpleStringProperty name;
+        private final SimpleStringProperty lastName;
+        private final SimpleStringProperty email;
+
+        private Record(int id, String name, String lastName, String email) {
+            this.id = new SimpleIntegerProperty(id);
+            this.name = new SimpleStringProperty(name);
+            this.lastName = new SimpleStringProperty(lastName);
+            this.email = new SimpleStringProperty(email);
         }
 
-        return conn;
+        public int getId() {
+            return this.id.get();
+        }
+
+        public void setId(int id) {
+            this.id.set(id);
+        }
+
+        public String getName() {
+            return this.name.get();
+        }
+
+        public void setName(String name) {
+            this.name.set(name);
+        }
+
+        public String getLastName() {
+            return this.lastName.get();
+        }
+
+        public void setLastName(String lastName) {
+            this.lastName.set(lastName);
+        }
+
+        public String getEmail() {
+            return this.email.get();
+        }
+
+        public void setEmail(String email) {
+            this.email.set(email);
+        }
+    }
+    private TableView<Record> tableView = new TableView<>();
+    private final ObservableList<Record> recordList = FXCollections.observableArrayList();
+
+    private void prepareRecordList() {
+        recordList.add(new Record(12, "William", "Austin", "xxx@xxx.xxx"));
+        recordList.add(new Record(15, "Chris", "redfield", "yyy@yyy.yyy"));
+        recordList.add(new Record(1, "Java", "Buddy", "javabuddy@abc.yyy"));
     }
 
-    private void getBoissons() {
-        String SQL = "SELECT * FROM Boisson";
-        try (Connection conn = this.connect();
-             PreparedStatement pstmt = conn.prepareStatement(SQL)) {
+    @Override
+    public void start(Stage primaryStage) {
+        Scene scene = new Scene(new Group());
+        primaryStage.setTitle("http://java-buddy.blogspot.com/");
+        primaryStage.setWidth(400);
+        primaryStage.setHeight(500);
 
-            System.out.println(SQL);
-            ResultSet rs = pstmt.executeQuery();
+        prepareRecordList();
 
-            while (rs.next()) {
-                System.out.printf("%s %d%n", rs.getString("nom"), rs.getInt("contenance"));
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+        tableView.setEditable(false);
+
+        Callback<TableColumn, TableCell> integerCellFactory =
+                new Callback<TableColumn, TableCell>() {
+                    @Override
+                    public TableCell call(TableColumn p) {
+                        MyIntegerTableCell cell = new MyIntegerTableCell();
+                        cell.addEventFilter(MouseEvent.MOUSE_CLICKED, new MyEventHandler());
+                        return cell;
+                    }
+                };
+
+        Callback<TableColumn, TableCell> stringCellFactory =
+                new Callback<TableColumn, TableCell>() {
+                    @Override
+                    public TableCell call(TableColumn p) {
+                        MyStringTableCell cell = new MyStringTableCell();
+                        cell.addEventFilter(MouseEvent.MOUSE_CLICKED, new MyEventHandler());
+                        return cell;
+                    }
+                };
+
+        TableColumn colId = new TableColumn("ID");
+        colId.setCellValueFactory(
+                new PropertyValueFactory<Record, String>("id"));
+        colId.setCellFactory(integerCellFactory);
+
+        TableColumn colName = new TableColumn("Name");
+        colName.setCellValueFactory(
+                new PropertyValueFactory<Record, String>("name"));
+        colName.setCellFactory(stringCellFactory);
+
+        TableColumn colLastName = new TableColumn("Last Name");
+        colLastName.setCellValueFactory(
+                new PropertyValueFactory<Record, String>("lastName"));
+        colLastName.setCellFactory(stringCellFactory);
+
+        TableColumn colEmail = new TableColumn("Email");
+        colEmail.setCellValueFactory(
+                new PropertyValueFactory<Record, String>("email"));
+        colEmail.setCellFactory(stringCellFactory);
+
+        tableView.setItems(recordList);
+        tableView.getColumns().addAll(colId, colName, colLastName, colEmail);
+
+        final VBox vbox = new VBox();
+        vbox.setSpacing(5);
+        vbox.setPadding(new Insets(10, 0, 0, 10));
+        vbox.getChildren().add(tableView);
+
+        ((Group) scene.getRoot()).getChildren().addAll(vbox);
+
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+    class MyIntegerTableCell extends TableCell<Record, Integer> {
+
+        @Override
+        public void updateItem(Integer item, boolean empty) {
+            super.updateItem(item, empty);
+            setText(empty ? null : getString());
+            setGraphic(null);
+        }
+
+        private String getString() {
+            return getItem() == null ? "" : getItem().toString();
+        }
+    }
+
+    class MyStringTableCell extends TableCell<Record, String> {
+
+        @Override
+        public void updateItem(String item, boolean empty) {
+            super.updateItem(item, empty);
+            setText(empty ? null : getString());
+            setGraphic(null);
+        }
+
+        private String getString() {
+            return getItem() == null ? "" : getItem().toString();
+        }
+    }
+
+    class MyEventHandler implements EventHandler<MouseEvent> {
+
+        @Override
+        public void handle(MouseEvent t) {
+            TableCell c = (TableCell) t.getSource();
+            int index = c.getIndex();
+            System.out.println("id = " + recordList.get(index).getId());
+            System.out.println("name = " + recordList.get(index).getName());
+            System.out.println("lastName = " + recordList.get(index).getLastName());
+            System.out.println("email = " + recordList.get(index).getEmail());
         }
     }
 }

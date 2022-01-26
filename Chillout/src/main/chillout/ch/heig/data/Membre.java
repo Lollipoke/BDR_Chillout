@@ -3,14 +3,14 @@ package ch.heig.data;
 import java.sql.Date;
 
 public class Membre extends Personne{
-    private final String libelleFiliere;
+    private final String libelléFilière;
 
-    public Membre(int id, String nom, String prenom, Date dateNaissance, Date dateArrivee, boolean actif, String libelleFiliere) {
-        super(id, nom, prenom, dateNaissance, dateArrivee, actif);
-        this.libelleFiliere = libelleFiliere;
+    public Membre(int id, String nom, String prénom, Date dateNaissance, Date dateArrivée, boolean actif, String libelléFilière) {
+        super(id, nom, prénom, dateNaissance, dateArrivée, actif);
+        this.libelléFilière = libelléFilière;
     }
 
-    public String getLibelleFiliere() {
-        return libelleFiliere;
+    public String getLibelléFilière() {
+        return libelléFilière;
     }
 }

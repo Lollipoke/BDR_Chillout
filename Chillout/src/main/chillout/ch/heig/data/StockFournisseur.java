@@ -5,8 +5,8 @@ import java.sql.Date;
 public class StockFournisseur extends Stock{
     private final Fournisseur fournisseur;
 
-    public StockFournisseur(Boisson boisson, Date datePeremption, int quantite, Fournisseur fournisseur) {
-        super(boisson, datePeremption, quantite);
+    public StockFournisseur(Boisson boisson, Date datePéremption, int quantité, Fournisseur fournisseur) {
+        super(boisson, datePéremption, quantité);
         this.fournisseur = fournisseur;
     }
 

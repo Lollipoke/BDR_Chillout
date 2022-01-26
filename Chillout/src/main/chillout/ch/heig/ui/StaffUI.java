@@ -19,7 +19,7 @@ public class StaffUI {
         mainStack.setCenter(staffPane);
 
         // Top level container for all view content
-        return new Scene(mainStack, 800, 500);
+        return new Scene(mainStack, 1000, 700);
     }
 
     private static Pane createTitlePane(String name) {

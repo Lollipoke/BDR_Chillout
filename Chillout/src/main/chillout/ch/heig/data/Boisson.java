@@ -4,13 +4,13 @@ public class Boisson {
     private final int id;
     private final String nom;
     private final int contenance;
-    private final boolean disponibilite;
+    private final boolean disponibilité;
 
-    public Boisson(int id, String nom, int contenance, boolean disponibilite) {
+    public Boisson(int id, String nom, int contenance, boolean disponibilité) {
         this.id = id;
         this.nom = nom;
         this.contenance = contenance;
-        this.disponibilite = disponibilite;
+        this.disponibilité = disponibilité;
     }
 
     public int getId() {
@@ -25,7 +25,7 @@ public class Boisson {
         return contenance;
     }
 
-    public boolean isDisponibilite(){
-        return disponibilite;
+    public boolean getDisponibilité(){
+        return disponibilité;
     }
 }

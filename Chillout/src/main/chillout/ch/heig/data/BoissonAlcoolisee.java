@@ -4,15 +4,16 @@ public class BoissonAlcoolisee extends Boisson {
     private final double tauxAlcool;
     private final int ageMin;
     private final String pays;
-    private final String region;
+    private final String région;
 
 
-    public BoissonAlcoolisee(int id, String nom, int contenance, boolean disponibilite, double tauxAlcool, int ageMin, String pays, String region) {
+    public BoissonAlcoolisee(int id, String nom, int contenance, boolean disponibilite,
+                             double tauxAlcool, int ageMin, String pays, String région) {
         super(id, nom, contenance, disponibilite);
         this.tauxAlcool = tauxAlcool;
         this.ageMin = ageMin;
         this.pays = pays;
-        this.region = region;
+        this.région = région;
     }
 
     public double getTauxAlcool() {
@@ -27,7 +28,7 @@ public class BoissonAlcoolisee extends Boisson {
         return pays;
     }
 
-    public String getRegion() {
-        return region;
+    public String getRégion() {
+        return région;
     }
 }

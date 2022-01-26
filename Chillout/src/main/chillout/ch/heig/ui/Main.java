@@ -46,7 +46,7 @@ public final class Main extends Application {
         mainStack.setTop(welcomePane);
 
         // Top level container for all view content
-        Scene scene = new Scene(mainStack, 800, 500);
+        Scene scene = new Scene(mainStack, 1000, 700);
 
         // primaryStage is the main top level window created by platform
         primaryStage.setTitle("Chillout App");
@@ -130,7 +130,7 @@ public final class Main extends Application {
                     primaryStage.setScene(StaffUI.createStaffWindow(nom));
                 } else if(membreValid) {
                     stage.close(); // return to main window
-                    primaryStage.setScene(MembreUI.createMembreWindow(nom));
+                    primaryStage.setScene(MembreUI.createMembreWindow(nom, db));
                 } else {
                     setLoggingInvalid(nom, id);
                 }
@@ -162,7 +162,7 @@ public final class Main extends Application {
                 primaryStage.setScene(StaffUI.createStaffWindow(nom));
             } else {
 
-                primaryStage.setScene(MembreUI.createMembreWindow(nom));
+                primaryStage.setScene(MembreUI.createMembreWindow(nom, db));
             }
         });
     }

@@ -5,17 +5,17 @@ import java.sql.Date;
 public class Personne {
     private final int id;
     private final String nom;
-    private final String prenom;
+    private final String prénom;
     private final Date dateNaissance;
-    private final Date dateArrivee;
+    private final Date dateArrivée;
     private final boolean actif;
 
-    public Personne(int id, String nom, String prenom, Date dateNaissance, Date dateArrivee, boolean actif) {
+    public Personne(int id, String nom, String prénom, Date dateNaissance, Date dateArrivée, boolean actif) {
         this.id = id;
         this.nom = nom;
-        this.prenom = prenom;
+        this.prénom = prénom;
         this.dateNaissance = dateNaissance;
-        this.dateArrivee = dateArrivee;
+        this.dateArrivée = dateArrivée;
         this.actif = actif;
     }
 
@@ -27,19 +27,19 @@ public class Personne {
         return nom;
     }
 
-    public String getPrenom() {
-        return prenom;
+    public String getPrénom() {
+        return prénom;
     }
 
     public Date getDateNaissance() {
         return dateNaissance;
     }
 
-    public Date getDateArrivee() {
-        return dateArrivee;
+    public Date getDateArrivée() {
+        return dateArrivée;
     }
 
-    public boolean isActif() {
+    public boolean getActif() {
         return actif;
     }
 }

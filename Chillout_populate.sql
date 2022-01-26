@@ -219,7 +219,17 @@ INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES ('21.12
 INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES ('21.12.2021', 7, TRUE);
 INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES ('21.12.2021', 6, TRUE);
 INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES ('21.12.2021', 3, TRUE);
+
 /* - Client - */
+
+INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES ('12.01.2022', 1, FALSE);
+INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES ('31.12.2021', 2, FALSE);
+INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES ('01.01.2022', 3, FALSE);
+INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES ('21.12.2021', 1, FALSE);
+INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES ('21.12.2021', 1, FALSE);
+INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES ('21.12.2021', 2, FALSE);
+INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES ('21.12.2021', 4, FALSE);
+INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES ('21.12.2021', 3, FALSE);
 
 
 
@@ -301,6 +311,10 @@ INSERT INTO StockFournisseur (idBoissonStock, datePéremptionStock, quantité, n
 INSERT INTO StockFournisseur (idBoissonStock, datePéremptionStock, quantité, nomFournisseur) VALUES (18, '01.01.2022', 2, 'Landi');
 INSERT INTO StockFournisseur (idBoissonStock, datePéremptionStock, quantité, nomFournisseur) VALUES (18, '02.01.2022', 2, 'Landi');
 
+
+/*
+ *
+ */
 
 /*================ Commande Stock ====================*/
 

@@ -28,7 +28,7 @@ public class Commande {
         return personne;
     }
 
-    public boolean isCommandeFournisseur() {
+    public boolean getCommandeFournisseur() {
         return commandeFournisseur;
     }
 }

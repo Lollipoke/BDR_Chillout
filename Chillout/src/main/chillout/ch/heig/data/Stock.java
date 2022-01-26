@@ -4,24 +4,24 @@ import java.sql.Date;
 
 public class Stock {
     private final Boisson boisson;
-    private final Date datePeremption;
-    private final int quantite;
+    private final Date datePéremption;
+    private final int quantité;
 
-    public Stock(Boisson boisson, Date datePeremption, int quantite) {
+    public Stock(Boisson boisson, Date datePéremption, int quantité) {
         this.boisson = boisson;
-        this.datePeremption = datePeremption;
-        this.quantite = quantite;
+        this.datePéremption = datePéremption;
+        this.quantité = quantité;
     }
 
     public Boisson getBoisson() {
         return boisson;
     }
 
-    public Date getDatePeremption() {
-        return datePeremption;
+    public Date getDatePéremption() {
+        return datePéremption;
     }
 
-    public int getQuantite() {
-        return quantite;
+    public int getQuantité() {
+        return quantité;
     }
 }

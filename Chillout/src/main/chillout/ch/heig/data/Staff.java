@@ -3,7 +3,7 @@ package ch.heig.data;
 import java.sql.Date;
 
 public class Staff extends Personne{
-    public Staff(int id, String nom, String prenom, Date dateNaissance, Date dateArrivee, boolean actif) {
-        super(id, nom, prenom, dateNaissance, dateArrivee, actif);
+    public Staff(int id, String nom, String prénom, Date dateNaissance, Date dateArrivée, boolean actif) {
+        super(id, nom, prénom, dateNaissance, dateArrivée, actif);
     }
 }

@@ -5,15 +5,15 @@ public class Fournisseur {
     private final String nomRue;
     private final int numRue;
     private final int codePostal;
-    private final String localite;
+    private final String localité;
     private final double fraisLivraison;
 
-    public Fournisseur(String nom, String nomRue, int numRue, int codePostal, String localite, double fraisLivraison) {
+    public Fournisseur(String nom, String nomRue, int numRue, int codePostal, String localité, double fraisLivraison) {
         this.nom = nom;
         this.nomRue = nomRue;
         this.numRue = numRue;
         this.codePostal = codePostal;
-        this.localite = localite;
+        this.localité = localité;
         this.fraisLivraison = fraisLivraison;
     }
 
@@ -33,8 +33,8 @@ public class Fournisseur {
         return codePostal;
     }
 
-    public String getLocalite() {
-        return localite;
+    public String getLocalité() {
+        return localité;
     }
 
     public double getFraisLivraison() {
