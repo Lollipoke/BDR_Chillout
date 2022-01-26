@@ -119,8 +119,8 @@ CREATE TABLE Personne (
     id SMALLSERIAL,
     nom VARCHAR(80) NOT NULL,
     prénom VARCHAR(80) NOT NULL,
-    dateNaissance DATE NOT NULL,
-    dateArrivée DATE NOT NULL CHECK (dateArrivée > dateNaissance),
+    dateNaissance DATE NOT NULL CHECK (dateNaissance < CURRENT_DATE),
+    dateArrivée DATE NOT NULL CHECK (dateArrivée > dateNaissance AND dateArrivée = CURRENT_DATE),
     actif BOOLEAN NOT NULL DEFAULT TRUE,
     CONSTRAINT PK_Personne PRIMARY KEY (id)
 );
