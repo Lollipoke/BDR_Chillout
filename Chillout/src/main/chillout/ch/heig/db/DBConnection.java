@@ -1,11 +1,11 @@
 package ch.heig.db;
 
-import ch.heig.data.Biere;
-import ch.heig.data.BoissonSoft;
-import ch.heig.data.Vin;
+import ch.heig.data.*;
 
+import java.nio.file.FileSystemNotFoundException;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class DBConnection {
@@ -126,5 +126,103 @@ public class DBConnection {
             System.out.println(e.getMessage());
         }
         return result;
+    }
+
+    public List<Commande> getCommandes(Personne p, boolean commandeFournisseur) {
+        ArrayList<Commande> commandes = new ArrayList<>();
+        String request = "SELECT Commande.id, Commande.dateHeure, Commande.idPersonne,\n" +
+                "array_agg(Commande_Stock.idBoissonStock) AS idBoissonStock, array_agg(Commande_Stock.datePéremptionStock) AS datePéremption, \n" +
+                "array_agg(Boisson.nom) AS nom, \n" +
+                "array_agg(Boisson.contenance) AS contenance, array_agg(Boisson.disponibilité) AS disponibilité, \n" +
+                "array_agg(Commande_stock.quantité) AS quantité\n" +
+                "FROM Commande\n" +
+                "INNER JOIN Commande_Stock\n" +
+                "ON Commande_Stock.idCommande = Commande.id\n" +
+                "INNER JOIN Boisson\n" +
+                "ON Boisson.id = Commande_Stock.idBoissonStock\n" +
+                "WHERE Commande.idPersonne = " + p.getId() + " AND Commande.commandeFournisseur = " + commandeFournisseur + "\n" +
+                "GROUP BY commande.id,  commande.dateheure, commande.idpersonne;";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(request)) {
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Commande c = new Commande(rs.getInt("id"), rs.getTimestamp("dateHeure"),
+                        p, commandeFournisseur);
+                Short[] idBoissonStock = (Short[])(rs.getArray("idBoissonStock").getArray());
+                Date[] datePéremption = (Date[])(rs.getArray("datePéremption").getArray());
+                String[] nom = (String[])(rs.getArray("nom").getArray());
+                Short[] contenance = (Short[])(rs.getArray("contenance").getArray());
+                Boolean[] disponibilité = (Boolean[])(rs.getArray("disponibilité").getArray());
+                Short[] quantité = (Short[])(rs.getArray("quantité").getArray());
+                HashMap<BoissonStockee, Integer> boissonsStockées = new HashMap<>();
+                for(int i = 0; i < idBoissonStock.length; i++){
+                    BoissonStockee bs = new BoissonStockee(idBoissonStock[i], nom[i], contenance[i], disponibilité[i], datePéremption[i]);
+                    boissonsStockées.put(bs, Integer.valueOf(quantité[i]));
+                }
+                c.setBoissonsStockées(boissonsStockées);
+                commandes.add(c);
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return commandes;
+    }
+
+    public Personne getPersonne(int id, boolean membre) {
+        return membre ? getMembre(id) : getStaff(id);
+    }
+
+    private Membre getMembre(int id) {
+        Membre membre = null;
+        String request = "SELECT Personne.id, Personne.nom, Personne.prénom, \n" +
+                "Personne.dateNaissance, Personne.dateArrivée, Personne.actif,\n" +
+                "Membre.libelléFilière\n" +
+                "FROM Membre\n" +
+                "INNER JOIN Personne\n" +
+                "ON Personne.id = Membre.idPersonne\n" +
+                "WHERE Personne.id = " + id + ";";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(request)) {
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                membre = new Membre(rs.getInt("id"),
+                        rs.getString("nom"),
+                        rs.getString("prénom"),
+                        rs.getDate("dateNaissance"),
+                        rs.getDate("dateArrivée"),
+                        rs.getBoolean("actif"),
+                        rs.getString("libelléFilière"));
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return membre;
+    }
+
+    private Staff getStaff(int id) {
+        Staff staff = null;
+        String request = "SELECT Personne.id, Personne.nom, Personne.prénom, \n" +
+                "Personne.dateNaissance, Personne.dateArrivée, Personne.actif\n" +
+                "FROM Staff\n" +
+                "INNER JOIN Personne\n" +
+                "ON Personne.id = Staff.idPersonne\n" +
+                "WHERE Personne.id =" + id + ";";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(request)) {
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                staff = new Staff(rs.getInt("id"),
+                        rs.getString("nom"),
+                        rs.getString("prénom"),
+                        rs.getDate("dateNaissance"),
+                        rs.getDate("dateArrivée"),
+                        rs.getBoolean("actif"));
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return staff;
     }
 }
