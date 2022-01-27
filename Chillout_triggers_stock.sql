@@ -24,28 +24,29 @@ CREATE OR REPLACE FUNCTION check_disponibilité_boisson() RETURNS TRIGGER
 LANGUAGE plpgsql
 AS 
 $BODY$
+    DECLARE
+        SommeStock INT;
 	BEGIN
-		IF(NEW.idCommande = (SELECT Commande.id FROM Commande WHERE Commande.commandeFournisseur = 'False' LIMIT 1)) THEN
-			IF EXISTS(SELECT SUM(Commande_Stock.quantité)
-								FROM Commande_Stock
-								INNER JOIN Commande
-									ON Commande_Stock.idCommande = Commande.id
-								WHERE Commande.commandeFournisseur = 'True' 
-									AND NEW.idBoissonStock = Commande_Stock.idBoissonStock 
-								HAVING (SUM(Commande_Stock.quantité) - (SELECT SUM(Commande_Stock.quantité)
-																		FROM Commande_Stock
-																		INNER JOIN Commande
-																			ON Commande_Stock.idCommande = Commande.id
-																		WHERE Commande.commandeFournisseur = 'False' 
-																			AND NEW.idBoissonStock = Commande_Stock.idBoissonStock 
-																		LIMIT 1)) >= NEW.quantité
-								) THEN
+		IF EXISTS(SELECT 1 FROM Commande WHERE Commande.id = NEW.idCommande AND Commande.commandeFournisseur = FALSE) THEN
+            SELECT COALESCE(SUM(Commande_Stock.quantité), 0) INTO SommeStock
+                FROM Commande_Stock
+                INNER JOIN Commande
+                ON Commande_Stock.idCommande = Commande.id
+                WHERE Commande.commandeFournisseur = TRUE
+                AND NEW.idBoissonStock = Commande_Stock.idBoissonStock
+                -   (SELECT COALESCE(SUM(Commande_Stock.quantité), 0)
+                        FROM Commande_Stock
+                        INNER JOIN Commande
+                        ON Commande_Stock.idCommande = Commande.id
+                        WHERE Commande.commandeFournisseur = FALSE
+                        AND NEW.idBoissonStock = Commande_Stock.idBoissonStock);
+			IF (NEW.quantité <= SommeStock) THEN
 				RETURN NEW;
 			ELSE
 				RAISE EXCEPTION 'Not enough stock in chillout';
 			END IF;
 		END IF;
- 		RETURN NULL;
+ 		RETURN NEW;
 	END;
 $BODY$;
 
