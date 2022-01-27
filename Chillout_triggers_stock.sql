@@ -43,10 +43,11 @@ $BODY$
 			IF (NEW.quantité <= SommeStock) THEN
 				RETURN NEW;
 			ELSE
+				raise notice 'Value: %', NEW.idCommande;
 				RAISE EXCEPTION 'Not enough stock in chillout';
 			END IF;
 		END IF;
- 		RETURN NEW;
+ 		RETURN NULL;
 	END;
 $BODY$;
 

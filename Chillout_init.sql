@@ -166,7 +166,7 @@ CREATE TABLE Evaluation (
 DROP TABLE IF EXISTS Commande CASCADE;
 CREATE TABLE Commande (
     id SMALLSERIAL,
-    dateHeure TIMESTAMP NOT NULL,
+    dateHeure TIMESTAMP NOT NULL CHECK (dateHeure = CURRENT_TIMESTAMP),
     idPersonne SMALLINT NOT NULL,
 	commandeFournisseur BOOLEAN NOT NULL,
     CONSTRAINT PK_Commande PRIMARY KEY (id)
