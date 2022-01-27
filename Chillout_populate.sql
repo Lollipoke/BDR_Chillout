@@ -332,6 +332,7 @@ INSERT INTO StockChillout (idBoissonStock, datePéremptionStock, prixDeVente) VA
 
 /*================ Commande Stock ====================*/
 
+/* === Commande au Fournisseur === */
 INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (1, 1, '13.02.2023', 2);
 /*INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (1, 1, '11.02.2023', 1);
 INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (1, 5, '13.02.2023', 3);
@@ -343,8 +344,14 @@ INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, qu
 INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (5, 3, '12.01.2022', 6);
 INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (6, 4, '18.02.2023', 6);
 INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (7, 5, '12.01.2023', 6);
-INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (8, 6, '12.01.2023', 6);
-INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (9, 6, '12.01.2023', 2);
+
+/* === Commande au Chillout === */
+INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (8, 5, '12.01.2023', 3);
+/*INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (9, 3, '12.01.2022', 2);*/
+/*INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (10, 5, '12.01.2023', 5);*/
+/*INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (10, 5, '12.01.2023', 1);*/
+/*INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (8, 6, '12.01.2023', 6);*/
+/*INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (9, 6, '12.01.2023', 2);
 INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (9, 1, '13.02.2023', 1);
 INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (9, 1, '14.02.2023', 2);
 INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (9, 5, '31.12.2021', 3);
@@ -353,4 +360,4 @@ INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, qu
 INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (12, 6, '12.01.2023', 6);
 /*INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (13, 18, '12.01.2023', 1);*/ /* marche pas*/
 INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (14, 6, '12.01.2023', 2);
-INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (15, 6, '12.01.2023', 4);
+INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (15, 6, '12.01.2023', 4);*/
