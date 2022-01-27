@@ -369,7 +369,7 @@ INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, qu
 INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (4, 2, '31.12.2021', 6);*/ /* marche pas */
 INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (5, 3, '12.01.2022', 6);
 INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (6, 4, '18.02.2023', 6);
-INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (7, 5, '12.01.2023', 6);
+--INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (7, 5, '12.01.2023', 6);
 
 /* === Commande au Chillout === */
 INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (8, 5, '12.01.2023', 4);

@@ -9,19 +9,75 @@ $BODY$
             IF EXISTS (SELECT 1 FROM Staff INNER JOIN Personne ON id = idPersonne WHERE new.idPersonne = idPersonne AND actif = TRUE) THEN
                 RETURN NEW;
             ELSE
-                RAISE EXCEPTION 'Cannot create a supplier order while being a member';
+                RAISE EXCEPTION 'Impossible de créer une commande fournisseur en étant Membre';
             END IF;
         ELSEIF EXISTS (SELECT 1 FROM Membre INNER JOIN Personne ON id = idPersonne WHERE new.idPersonne = idPersonne AND actif = TRUE) THEN
                 RETURN NEW;
             ELSE
-                RAISE EXCEPTION 'Cannot create a client order while being a staff';
+                RAISE EXCEPTION 'Impossible de créer une commande client en étant Staff';
         END IF;
 		RETURN NULL;
     END;
 $BODY$;
 
-CREATE OR REPLACE TRIGGER check_person_role_before_insert_or_update_Commande
-AFTER INSERT OR UPDATE
+CREATE OR REPLACE TRIGGER check_person_role_before_insert_Commande
+BEFORE INSERT
 ON Commande
 FOR EACH ROW
 EXECUTE FUNCTION function_check_role_commande();
+
+/*=============================== Check if drink is available TRIGGER ==========================*/
+CREATE OR REPLACE FUNCTION function_check_disponibilité_Boisson_commande_stock() RETURNS TRIGGER
+LANGUAGE plpgsql
+AS
+$BODY$
+	BEGIN
+    IF EXISTS (SELECT 1 FROM Commande WHERE new.idCommande = id) THEN
+        IF EXISTS (SELECT 1 FROM Boisson WHERE new.idBoissonStock = id AND disponibilité = TRUE) THEN
+            RETURN NEW;
+        ELSE
+            RAISE EXCEPTION 'La boisson avec l''id % n''est pas disponible', new.idBoissonStock;
+        END IF;
+    ELSE
+        RAISE EXCEPTION 'La commande avec l''id % n''existe pas', new.idCommande;
+    END IF;
+    END;
+$BODY$;
+
+CREATE OR REPLACE TRIGGER check_quantity_ChilloutStock_before_insert_Commande
+BEFORE INSERT
+ON Commande_Stock
+FOR EACH ROW
+EXECUTE FUNCTION function_check_disponibilité_Boisson_commande_stock();
+
+/*=============================== Check if drink is sold by supplier TRIGGER ==========================*/
+CREATE OR REPLACE FUNCTION function_check_supplier_sell_drink_commande_stock() RETURNS TRIGGER
+LANGUAGE plpgsql
+AS
+$BODY$
+	BEGIN
+	IF EXISTS(SELECT 1 FROM Commande WHERE NEW.idCommande = Commande.id AND Commande.commandeFournisseur = TRUE) THEN
+        IF EXISTS (SELECT 1 FROM Boisson_Fournisseur
+                        INNER JOIN StockFournisseur
+                            ON StockFournisseur.idBoissonStock = idBoisson
+                        INNER JOIN Commande_Stock
+                            ON StockFournisseur.idBoissonStock = Commande_Stock.idBoissonStock
+                        INNER JOIN Commande
+                            ON Commande_Stock.idCommande = Commande.id
+                        WHERE new.idBoissonStock = StockFournisseur.idBoissonStock
+                        AND StockFournisseur.nomFournisseur = Boisson_Fournisseur.nomFournisseur
+                        AND Commande.commandeFournisseur = true) THEN
+            RETURN NEW;
+        ELSE
+            RAISE EXCEPTION 'Le fournisseur ne dispose pas de la boisson #%', new.idBoissonStock;
+        END IF;
+    END IF;
+	RETURN NEW;
+    END;
+$BODY$;
+
+CREATE OR REPLACE TRIGGER check_supplier_sell_drink_before_insert_Commande
+BEFORE INSERT OR UPDATE
+ON Commande_Stock
+FOR EACH ROW
+EXECUTE FUNCTION function_check_supplier_sell_drink_commande_stock();
