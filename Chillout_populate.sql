@@ -109,7 +109,7 @@ INSERT INTO Personne (nom, prénom, dateNaissance, dateArrivée, actif) VALUES (
 INSERT INTO Personne (nom, prénom, dateNaissance, dateArrivée, actif) VALUES ('Monjeau', 'Hélène', '2005-05-30', CURRENT_DATE, true);
 INSERT INTO Personne (nom, prénom, dateNaissance, dateArrivée, actif) VALUES ('Boileau', 'Xavier', '2000-10-20', CURRENT_DATE, true);
 INSERT INTO Personne (nom, prénom, dateNaissance, dateArrivée, actif) VALUES ('Charest', 'Xavier', '1996-02-28', CURRENT_DATE, true);
-INSERT INTO Personne (nom, prénom, dateNaissance, dateArrivée, actif) VALUES ('Leroy', 'Raoul', '2007-08-21', CURRENT_DATE, false);
+INSERT INTO Personne (nom, prénom, dateNaissance, dateArrivée, actif) VALUES ('Leroy', 'Raoul', '2007-08-21', CURRENT_DATE, true);
 INSERT INTO Personne (nom, prénom, dateNaissance, dateArrivée, actif) VALUES ('Jolicoeur', 'Patricia', '1998-12-14', CURRENT_DATE, false);
 INSERT INTO Personne (nom, prénom, dateNaissance, dateArrivée, actif) VALUES ('Sansouci', 'Arnaud', '1999-06-21', CURRENT_DATE, false);
 
@@ -238,17 +238,15 @@ INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES (CURREN
 INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES (CURRENT_TIMESTAMP, 7, TRUE);
 INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES (CURRENT_TIMESTAMP, 6, TRUE);
 
-/* TODO : Si on utilise les insert ci-dessous, il faut commenter les autres insert et retirer le check de la date courrente
-	dans la table Commande */
-/*
-INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES ('12.01.2022', 10, TRUE);
+/* TODO : Si on utilise les insert ci-dessous, il faut commenter les autres insert et retirer le check dans la table Commande*/
+/*INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES ('12.01.2022', 10, TRUE);
 INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES ('01.01.2022', 11, TRUE);
 INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES ('31.12.2021', 12, TRUE);
 INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES ('21.12.2021', 6, TRUE);
 INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES ('21.12.2021', 6, TRUE);
 INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES ('21.12.2021', 7, TRUE);
-INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES ('21.12.2021', 6, TRUE);
-*/
+INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES ('21.12.2021', 6, TRUE);*/
+
 /* - Client - */
 
 INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES (CURRENT_TIMESTAMP, 1, FALSE);
@@ -260,18 +258,16 @@ INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES (CURREN
 INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES (CURRENT_TIMESTAMP, 4, FALSE);
 INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES (CURRENT_TIMESTAMP, 3, FALSE);
 
-/* TODO : Si on utilise les insert ci-dessous, il faut commenter les autres insert et retirer le check de la date courrente
-	dans la table Commande */
-/*
-INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES ('12.01.2022', 1, FALSE);
+/* TODO : Si on utilise les insert ci-dessous, il faut commenter les autres insert et retirer le check dans la table Commande*/
+/*INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES ('12.01.2022', 1, FALSE);
 INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES ('31.12.2021', 2, FALSE);
 INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES ('01.01.2022', 3, FALSE);
 INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES ('21.12.2021', 1, FALSE);
 INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES ('21.12.2021', 1, FALSE);
 INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES ('21.12.2021', 2, FALSE);
 INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES ('21.12.2021', 4, FALSE);
-INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES ('21.12.2021', 3, FALSE);
-*/
+INSERT INTO Commande (dateHeure, idPersonne, commandeFournisseur) VALUES ('21.12.2021', 3, FALSE);*/
+
 
 
 /*================ Stock ====================*/
@@ -359,9 +355,9 @@ INSERT INTO StockChillout (idBoissonStock, datePéremptionStock, prixDeVente) VA
 /*================ Commande Stock ====================*/
 
 /* === Commande au Fournisseur === */
-INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (1, 1, '13.02.2023', 2);
-/*INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (1, 1, '11.02.2023', 1);
-INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (1, 5, '13.02.2023', 3);
+INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (1, 1, '13.02.2023', 7);
+INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (2, 1, '13.02.2023', 2);
+/*INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (1, 5, '13.02.2023', 3);
 INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (1, 7, '13.02.2023', 1);
 INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (1, 1, '13.02.2023', 1);
 INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (2, 1, '14.02.2023', 2);
@@ -372,8 +368,9 @@ INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, qu
 --INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (7, 5, '12.01.2023', 6);
 
 /* === Commande au Chillout === */
-INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (8, 5, '12.01.2023', 4);
-INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (9, 3, '12.01.2022', 2);
+INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (9, 4, '18.02.2023', 1);
+/*INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (9, 3, '12.01.2022', 2);*/
+/*INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (10, 5, '12.01.2023', 2);*/
 /*INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (10, 5, '12.01.2023', 5);*/
 /*INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (10, 5, '12.01.2023', 1);*/
 /*INSERT INTO Commande_Stock (idCommande, idBoissonStock, datePéremptionStock, quantité) VALUES (8, 6, '12.01.2023', 6);*/

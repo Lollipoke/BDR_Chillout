@@ -74,7 +74,7 @@ DROP TABLE IF EXISTS StockFournisseur CASCADE;
 CREATE TABLE StockFournisseur (
     idBoissonStock SMALLINT,
     datePéremptionStock DATE,
-    quantité SMALLINT NOT NULL CHECK (quantité > 0),
+    quantité SMALLINT NOT NULL CHECK (quantité >= 0),
     nomFournisseur VARCHAR(80) NOT NULL,
     CONSTRAINT PK_StockFournisseur PRIMARY KEY (idBoissonStock, datePéremptionStock)
 );
