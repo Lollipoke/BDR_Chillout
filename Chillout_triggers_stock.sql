@@ -20,28 +20,46 @@ EXECUTE FUNCTION refill_StockFournisseur();
 
 
 /*=============================== [WIP] Quantité de boisson en stock suffisante au chillout pour quantité de boisson commandé TRIGGER ==========================*/
-/*CREATE OR REPLACE FUNCTION check_disponibilité_boisson() RETURNS TRIGGER
+CREATE OR REPLACE FUNCTION get_current_ChilloutStock(boissonACalculer INT) RETURNS INT
 LANGUAGE plpgsql
-AS 
+AS
 $BODY$
-	BEGIN
-		IF EXISTS(SELECT 1 FROM Commande WHERE Commande.id = NEW.idCommande AND Commande.commandeFournisseur = FALSE) THEN
-            IF (NEW.quantité <= ((SELECT COALESCE(SUM(Commande_Stock.quantité), 0)
-                					FROM Commande_Stock
-                					INNER JOIN Commande
-                						ON Commande_Stock.idCommande = Commande.id
-                					WHERE Commande.commandeFournisseur = TRUE
-                					AND NEW.idBoissonStock = Commande_Stock.idBoissonStock LIMIT 1)
-                					-   (SELECT COALESCE(SUM(Commande_Stock.quantité), 0)
+    DECLARE
+        sommeStock INT;
+    BEGIN
+        IF EXISTS (SELECT 1 FROM Boisson WHERE Boisson.id = boissonACalculer) THEN
+            SELECT COALESCE(SUM(Commande_Stock.quantité), 0) INTO sommeStock
+                FROM Commande_Stock
+                INNER JOIN Commande
+                ON Commande_Stock.idCommande = Commande.id
+                WHERE Commande.commandeFournisseur = TRUE
+                AND boissonACalculer = Commande_Stock.idBoissonStock
+                -   (SELECT COALESCE(SUM(Commande_Stock.quantité), 0)
                         FROM Commande_Stock
                         INNER JOIN Commande
                         ON Commande_Stock.idCommande = Commande.id
                         WHERE Commande.commandeFournisseur = FALSE
-                        AND NEW.idBoissonStock = Commande_Stock.idBoissonStock LIMIT 1)))
-			THEN
+                        AND boissonACalculer = Commande_Stock.idBoissonStock);
+            RETURN sommeStock;
+        ELSE
+            RAISE EXCEPTION 'La boisson avec l''id #% n''existe pas', boissonACalculer;
+        END IF;
+    END;
+$BODY$;
+
+CREATE OR REPLACE FUNCTION check_disponibilité_boisson() RETURNS TRIGGER
+LANGUAGE plpgsql
+AS
+$BODY$
+    DECLARE
+        sommeStock INT;
+	BEGIN
+		IF EXISTS(SELECT 1 FROM Commande WHERE Commande.id = NEW.idCommande AND Commande.commandeFournisseur = FALSE) THEN
+            sommeStock := get_current_ChilloutStock(NEW.idBoissonStock);
+			IF (NEW.quantité <= sommeStock) THEN
 				RETURN NEW;
 			ELSE
-				RAISE NOTICE 'Value: %', NEW.idCommande;
+				raise notice 'Value: %', NEW.idCommande;
 				RAISE EXCEPTION 'Not enough stock in chillout';
 			END IF;
 		END IF;
@@ -50,10 +68,10 @@ $BODY$
 $BODY$;
 
 CREATE OR REPLACE TRIGGER check_before_insert_or_update_commande_stock
-BEFORE INSERT OR UPDATE
+AFTER INSERT OR UPDATE
 ON Commande_Stock
 FOR EACH ROW
-EXECUTE FUNCTION check_disponibilité_boisson();*/
+EXECUTE FUNCTION check_disponibilité_boisson();
 
 /*=============================== [WIP] Quantité de boisson en stock suffisante au fournisseur pour quantité de boisson commandé TRIGGER ==========================*/
 CREATE OR REPLACE FUNCTION check_disponibilité_boisson_dans_fournisseur() RETURNS TRIGGER
