@@ -96,13 +96,13 @@ $BODY$
         IF (min_age IS NULL) THEN
             min_age := 0;
         END IF;
-        raise notice 'Value min_age: %', min_age;
+        RAISE NOTICE 'Value min_age: %', min_age;
         SELECT EXTRACT(YEAR FROM AGE(NOW(), dateNaissance)) INTO member_age FROM Personne INNER JOIN Membre ON Membre.idPersonne = Personne.id INNER JOIN Commande ON Commande.idPersonne = Personne.id WHERE Commande.id = NEW.idCommande;
-        raise notice 'Value member_age: %', member_age;
+        RAISE NOTICE 'Value member_age: %', member_age;
         IF (member_age >= min_age) THEN
             RETURN NEW;
         ELSE
-            RAISE EXCEPTION 'L''age du client ne permet pas l''achat de cette boisson % %', min_age, member_age;
+            RAISE EXCEPTION 'L''age du client ne permet pas l''achat de cette boisson';
         END IF;
     END;
 $BODY$;
@@ -112,3 +112,43 @@ BEFORE INSERT OR UPDATE
 ON Commande_Stock
 FOR EACH ROW
 EXECUTE FUNCTION function_check_member_age_commande_stock();
+
+/*=============================== Check if all order are from the same supplier TRIGGER ==========================*/
+CREATE OR REPLACE FUNCTION function_check_same_supplier_commande_stock() RETURNS TRIGGER
+LANGUAGE plpgsql
+AS
+$BODY$
+    DECLARE
+        nomFournisseurCommande VARCHAR;
+	BEGIN
+	    IF EXISTS (SELECT 1 FROM Commande WHERE Commande.id = NEW.idCommande AND commandeFournisseur = TRUE) THEN
+            -- On récupère le nom du fournisseur de boisson d'une des insertions précédentes
+	        -- La nouvelle insertion ou modification peut se faire uniquement si le même fournisseur fourni la boisson
+            IF EXISTS (SELECT 1 FROM Commande_Stock WHERE Commande_Stock.idCommande = NEW.idCommande) THEN
+                SELECT nomFournisseur INTO nomFournisseurCommande
+                FROM StockFournisseur
+                    INNER JOIN Commande_Stock
+                        ON StockFournisseur.idBoissonStock = Commande_Stock.idBoissonStock
+                            AND StockFournisseur.datePéremptionStock = Commande_Stock.datePéremptionStock
+                WHERE Commande_Stock.idCommande = NEW.idCommande;
+                RAISE NOTICE 'Value nomFournisseurCommande: %', nomFournisseurCommande;
+                IF EXISTS(SELECT 1 FROM StockFournisseur WHERE idBoissonStock = NEW.idBoissonStock AND datePéremptionStock = NEW.datePéremptionStock AND nomFournisseur = nomFournisseurCommande) THEN
+                    RETURN NEW;
+                ELSE
+                    RAISE EXCEPTION 'La contrainte indiquant que toutes les boissons d''une commande fournisseur sont fourni par un et un seul fournisseur est violée';
+                END IF;
+            ELSE
+                RETURN NEW;
+            END IF;
+	    ELSE
+	        RAISE NOTICE 'Value idCommande: %', NEW.idCommande;
+            RAISE EXCEPTION 'La commande n''existe pas';
+        END IF;
+    END;
+$BODY$;
+
+CREATE OR REPLACE TRIGGER check_same_supplier_insert_or_update_Commande
+BEFORE INSERT OR UPDATE
+ON Commande_Stock
+FOR EACH ROW
+EXECUTE FUNCTION function_check_same_supplier_commande_stock();
