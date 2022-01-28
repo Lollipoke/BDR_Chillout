@@ -7,6 +7,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DBConnection {
     private static final String URL =
@@ -154,10 +155,10 @@ public class DBConnection {
                 Short[] contenance = (Short[])(rs.getArray("contenance").getArray());
                 Boolean[] disponibilité = (Boolean[])(rs.getArray("disponibilité").getArray());
                 Short[] quantité = (Short[])(rs.getArray("quantité").getArray());
-                HashMap<BoissonStockee, Integer> boissonsStockées = new HashMap<>();
+                ArrayList<BoissonStockee> boissonsStockées = new ArrayList<>();
                 for(int i = 0; i < idBoissonStock.length; i++){
-                    BoissonStockee bs = new BoissonStockee(idBoissonStock[i], nom[i], contenance[i], disponibilité[i], datePéremption[i]);
-                    boissonsStockées.put(bs, Integer.valueOf(quantité[i]));
+                    BoissonStockee bs = new BoissonStockee(idBoissonStock[i], nom[i], contenance[i], disponibilité[i], datePéremption[i], quantité[i]);
+                    boissonsStockées.add(bs);
                 }
                 c.setBoissonsStockées(boissonsStockées);
                 commandes.add(c);
@@ -225,4 +226,148 @@ public class DBConnection {
         }
         return staff;
     }
+
+    public double getNoteMoyenne(Boisson boisson) {
+        double noteMoyenne = 0.;
+        String request = "SELECT COALESCE(ROUND(AVG(note), 2), 0.00) AS noteMoyenne\n" +
+                "FROM Evaluation\n" +
+                "WHERE idBoisson = " + boisson.getId() + ";";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(request)) {
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                noteMoyenne = rs.getDouble("noteMoyenne");
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return noteMoyenne;
+    }
+
+    public Integer getNote(Boisson boisson, Personne p) {
+        Integer note = null;
+        String request = "SELECT note\n" +
+                "FROM Evaluation\n" +
+                "WHERE idBoisson = " + boisson.getId() + " AND idMembre = "+ p.getId() + " ;";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(request)) {
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                note = rs.getInt("note");
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return note;
+    }
+
+    public void addEvaluation(Boisson boisson, Personne p, int note) {
+        String request = "INSERT INTO Evaluation VALUES ("+boisson.getId()+", "
+                +p.getId()+", "+ note + ", current_timestamp);";
+        try (PreparedStatement pstmt = connection.prepareStatement(request)) {
+            pstmt.executeQuery();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public List<BoissonStockee> getStockChillout() {
+        ArrayList<BoissonStockee> listeBoissons = new ArrayList<>();
+        int nbBoissons = getNbBoissonsDisponibles();
+        for(int i = 0; i < nbBoissons; i++) {
+            int nextId = getIdBoissonDisponible(i);
+            String request = "SELECT Boisson.id, Boisson.nom, Boisson.contenance, \n" +
+                    "Boisson.disponibilité, Stock.datePéremption, get_current_ChilloutStock("+nextId+", Stock.datePéremption) AS quantité\n" +
+                    "FROM Boisson\n" +
+                    "INNER JOIN Stock\n" +
+                    "ON Stock.idBoisson = Boisson.id\n" +
+                    "WHERE Boisson.id = "+nextId+";";
+            try (PreparedStatement pstmt = connection.prepareStatement(request)) {
+                ResultSet rs = pstmt.executeQuery();
+
+                while (rs.next()) {
+                    if(rs.getInt("quantité") > 0) {
+                        BoissonStockee bs = new BoissonStockee(rs.getInt("id"), rs.getString("nom"),
+                                rs.getInt("contenance"), rs.getBoolean("disponibilité"),
+                                rs.getDate("datePéremption"), rs.getInt("quantité"));
+                        listeBoissons.add(bs);
+                    }
+                }
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+        return listeBoissons;
+    }
+
+    private int getNbBoissonsDisponibles() {
+        int nbBoissons = 0;
+        String request = "SELECT COUNT(*) AS nbBoissons\n" +
+                "FROM Boisson\n" +
+                "WHERE Boisson.disponibilité = 'TRUE';";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(request)) {
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                nbBoissons = rs.getInt("nbBoissons");
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return nbBoissons;
+    }
+
+    private int getIdBoissonDisponible(int place) {
+        int id = -1;
+        String request = "SELECT id\n" +
+                "FROM Boisson\n" +
+                "WHERE Boisson.disponibilité = 'TRUE'\n" +
+                "OFFSET "+ place + " LIMIT 1;";
+        try (PreparedStatement pstmt = connection.prepareStatement(request)) {
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                id = rs.getInt("id");
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return id;
+    }
+
+    public void addNewCommande(List<BoissonStockee> boissons, Personne p) {
+        String request = "INSERT INTO COMMANDE (dateHeure, idPersonne, commandeFournisseur) VALUES (current_timestamp, "+ p.getId()+ ", 'FALSE');";
+        try (PreparedStatement pstmt = connection.prepareStatement(request)) {
+            pstmt.executeQuery();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        // Get the id of the command
+        int commandId = 0;
+        request = "SELECT id FROM Commande WHERE idPersonne = "
+                + p.getId() + " ORDER BY dateHeure DESC LIMIT 1" ;
+        try (PreparedStatement pstmt = connection.prepareStatement(request)) {
+            ResultSet rs = pstmt.executeQuery();
+            while(rs.next()) {
+                commandId = rs.getInt("id");
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        for(BoissonStockee bs : boissons) {
+            request = "INSERT INTO Commande_Stock VALUES ("+commandId+", "+
+                    bs.getId()+ ", TO_DATE('" + bs.getDatePéremption()+ "', 'YYYY-MM-DD'), "+bs.getQuantitéSouhaitée()+")";
+            try (PreparedStatement pstmt = connection.prepareStatement(request)) {
+                pstmt.executeQuery();
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
 }

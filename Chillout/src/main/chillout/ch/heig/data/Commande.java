@@ -9,7 +9,7 @@ public class Commande {
     private final Timestamp dateHeure;
     private final Personne personne;
     private final boolean commandeFournisseur;
-    private Map<BoissonStockee, Integer> boissonsStockées;
+    private List<BoissonStockee> boissonsStockées;
 
 
     public Commande(int id, Timestamp dateHeure, Personne personne, boolean commandeFournisseur) {
@@ -35,11 +35,11 @@ public class Commande {
         return commandeFournisseur;
     }
 
-    public void setBoissonsStockées(Map<BoissonStockee, Integer> boissonsStockées) {
+    public void setBoissonsStockées(List<BoissonStockee> boissonsStockées) {
         this.boissonsStockées = boissonsStockées;
     }
 
-    public Map<BoissonStockee, Integer> getBoissonsStockées() {
+    public List<BoissonStockee> getBoissonsStockées() {
         return boissonsStockées;
     }
 }

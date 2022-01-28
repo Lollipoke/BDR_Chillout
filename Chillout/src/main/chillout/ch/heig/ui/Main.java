@@ -78,27 +78,15 @@ public final class Main extends Application {
         loginText.setFont(new Font(20));
         loginText.setStyle("-fx-padding: 30px; -fx-alignment: center;");
         loginText.setText("Veuillez vous logger pour utiliser l'application : ");
-        Button btnLogin = new Button();
-        btnLogin.setText("Login");
-        btnLogin.setOnAction(event -> showLoginScreen());
-        VBox vbox = new VBox(20);
-        vbox.setAlignment(Pos.CENTER);
-        vbox.getChildren().add(loginText);
-        vbox.getChildren().add(btnLogin);
-        loginChoices.getChildren().add(vbox);
-        loginChoices.setStyle("-fx-padding: 30px;");
-        loginChoices.setAlignment(Pos.CENTER);
-        return loginChoices;
-    }
 
-    public void showLoginScreen() {
-        Stage stage = new Stage();
+        VBox vbox = new VBox();
 
-        VBox box = new VBox();
-        box.setPadding(new Insets(10));
+        GridPane gridPane = new GridPane();
+        gridPane.setHgap(10);
+        gridPane.setVgap(10);
 
         // How to center align content in a layout manager in JavaFX
-        box.setAlignment(Pos.CENTER);
+        gridPane.setAlignment(Pos.CENTER);
 
         Label label = new Label("Entrez votre nom et votre id");
 
@@ -124,12 +112,9 @@ public final class Main extends Application {
                 boolean membreValid = db.getMembreLoginValidity(nom, id);
                 if (staffValid && membreValid) {
                     setLoggedInUserChoice(nom, id);
-                    stage.close(); // return to main window
                 } else if (staffValid) {
-                    stage.close(); // return to main window
                     primaryStage.setScene(StaffUI.createStaffWindow(db.getPersonne(id, false)));
                 } else if(membreValid) {
-                    stage.close(); // return to main window
                     primaryStage.setScene(MembreUI.createMembreWindow(db.getPersonne(id, true), db));
                 } else {
                     setLoggingInvalid(nom, id);
@@ -137,14 +122,17 @@ public final class Main extends Application {
             }
         });
 
-        box.getChildren().add(label);
-        box.getChildren().add(textUser);
-        box.getChildren().add(textPass);
-        box.getChildren().add(btnLogin);
-        Scene scene = new Scene(box, 250, 150);
-        stage.setScene(scene);
-        stage.setResizable(false);
-        stage.show();
+        gridPane.add(label, 0, 0);
+        gridPane.add(textUser, 1, 0);
+        gridPane.add(textPass, 1, 1);
+        gridPane.add(btnLogin, 1, 2);
+
+        vbox.getChildren().add(loginText);
+        vbox.getChildren().add(gridPane);
+        loginChoices.getChildren().add(vbox);
+        loginChoices.setStyle("-fx-padding: 30px;");
+
+        return loginChoices;
     }
 
     public void setLoggedInUserChoice(String nom, int id) {
