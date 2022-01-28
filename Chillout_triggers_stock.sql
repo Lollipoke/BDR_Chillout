@@ -20,29 +20,33 @@ EXECUTE FUNCTION refill_StockFournisseur();
 
 
 /*=============================== [WIP] Quantité de boisson en stock suffisante au chillout pour quantité de boisson commandé TRIGGER ==========================*/
-CREATE OR REPLACE FUNCTION get_current_ChilloutStock(boissonACalculer INT) RETURNS INT
+CREATE OR REPLACE FUNCTION get_current_ChilloutStock(id_boisson INT, date_péremption DATE) RETURNS INT
 LANGUAGE plpgsql
 AS
 $BODY$
     DECLARE
         sommeStock INT;
     BEGIN
-        IF EXISTS (SELECT 1 FROM Boisson WHERE Boisson.id = boissonACalculer) THEN
-            SELECT COALESCE(SUM(Commande_Stock.quantité), 0) INTO sommeStock
-                FROM Commande_Stock
-                INNER JOIN Commande
-                ON Commande_Stock.idCommande = Commande.id
-                WHERE Commande.commandeFournisseur = TRUE
-                AND boissonACalculer = Commande_Stock.idBoissonStock
-                -   (SELECT COALESCE(SUM(Commande_Stock.quantité), 0)
-                        FROM Commande_Stock
-                        INNER JOIN Commande
-                        ON Commande_Stock.idCommande = Commande.id
-                        WHERE Commande.commandeFournisseur = FALSE
-                        AND boissonACalculer = Commande_Stock.idBoissonStock);
+        IF EXISTS (SELECT 1 FROM Stock WHERE Stock.idBoisson = id_boisson AND Stock.datePéremption = date_péremption) THEN
+				SELECT (
+					SELECT COALESCE(SUM(Commande_Stock.quantité), 0)
+						FROM Commande_Stock
+						INNER JOIN Commande
+							ON Commande_Stock.idCommande = Commande.id
+						WHERE Commande.commandeFournisseur = TRUE
+						AND id_boisson = Commande_Stock.idBoissonStock
+						AND date_péremption = Commande_Stock.datePéremptionStock)
+						-   ((SELECT COALESCE(SUM(Commande_Stock.quantité), 0)
+								FROM Commande_Stock
+								INNER JOIN Commande
+								ON Commande_Stock.idCommande = Commande.id
+								WHERE Commande.commandeFournisseur = FALSE
+								AND id_boisson = Commande_Stock.idBoissonStock
+								AND date_péremption = Commande_Stock.datePéremptionStock)
+					) INTO sommeStock;
             RETURN sommeStock;
         ELSE
-            RAISE EXCEPTION 'La boisson avec l''id #% n''existe pas', boissonACalculer;
+            RAISE EXCEPTION 'La boisson avec l''id #% et la date de péremption % n''existe pas', id_boisson, date_péremption;
         END IF;
     END;
 $BODY$;
