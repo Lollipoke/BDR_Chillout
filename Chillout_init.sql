@@ -55,7 +55,7 @@ CREATE TYPE TypeVin AS ENUM ('Rouge', 'Blanc', 'Rosé');
 CREATE TABLE Vin (
     idBoissonAlcoolisée SMALLINT,
     type TypeVin NOT NULL,
-    année SMALLINT NOT NULL CHECK (année > 1500),
+    année SMALLINT NOT NULL CHECK (année > 1500 AND année <= CAST(EXTRACT(YEAR FROM CURRENT_TIMESTAMP) AS SMALLINT)),
     CONSTRAINT PK_Vin PRIMARY KEY (idBoissonAlcoolisée)
 );
 /*-------------------------------------------*/
@@ -74,7 +74,7 @@ DROP TABLE IF EXISTS StockFournisseur CASCADE;
 CREATE TABLE StockFournisseur (
     idBoissonStock SMALLINT,
     datePéremptionStock DATE,
-    quantité SMALLINT NOT NULL CHECK (quantité > 0),
+    quantité SMALLINT NOT NULL CHECK (quantité >= 0),
     nomFournisseur VARCHAR(80) NOT NULL,
     CONSTRAINT PK_StockFournisseur PRIMARY KEY (idBoissonStock, datePéremptionStock)
 );
@@ -119,8 +119,8 @@ CREATE TABLE Personne (
     id SMALLSERIAL,
     nom VARCHAR(80) NOT NULL,
     prénom VARCHAR(80) NOT NULL,
-    dateNaissance DATE NOT NULL,
-    dateArrivée DATE NOT NULL CHECK (dateArrivée > dateNaissance),
+    dateNaissance DATE NOT NULL CHECK (dateNaissance < CURRENT_DATE),
+    dateArrivée DATE NOT NULL CHECK (dateArrivée > dateNaissance AND dateArrivée = CURRENT_DATE),
     actif BOOLEAN NOT NULL DEFAULT TRUE,
     CONSTRAINT PK_Personne PRIMARY KEY (id)
 );
@@ -157,7 +157,7 @@ CREATE TABLE Evaluation (
     idBoisson SMALLINT,
     idMembre SMALLINT,
     note SMALLINT NOT NULL CHECK (note >= 1 AND note <= 5),
-    date DATE NOT NULL,
+    date DATE NOT NULL CHECK (date = CURRENT_DATE),
     CONSTRAINT PK_Evaluation PRIMARY KEY (idBoisson, idMembre)
 );
 /*-------------------------------------------*/
@@ -166,7 +166,7 @@ CREATE TABLE Evaluation (
 DROP TABLE IF EXISTS Commande CASCADE;
 CREATE TABLE Commande (
     id SMALLSERIAL,
-    dateHeure TIMESTAMP NOT NULL,
+    dateHeure TIMESTAMP NOT NULL CHECK (dateHeure = CURRENT_TIMESTAMP),
     idPersonne SMALLINT NOT NULL,
 	commandeFournisseur BOOLEAN NOT NULL,
     CONSTRAINT PK_Commande PRIMARY KEY (id)
