@@ -592,38 +592,6 @@ ON Commande_Stock
 FOR EACH ROW
 EXECUTE FUNCTION function_check_disponibilité_Boisson_commande_stock();
 
-/*==================== Check si la boisson est fournie par une fournisseur =====================*/
-CREATE OR REPLACE FUNCTION function_check_supplier_sell_drink_commande_stock() RETURNS TRIGGER
-LANGUAGE plpgsql
-AS
-$BODY$
-	BEGIN
-	IF EXISTS(SELECT 1 FROM Commande WHERE NEW.idCommande = Commande.id AND Commande.commandeFournisseur = TRUE) THEN
-        IF EXISTS (SELECT 1 FROM Boisson_Fournisseur
-                        INNER JOIN StockFournisseur
-                            ON StockFournisseur.idBoissonStock = idBoisson
-                        INNER JOIN Commande_Stock
-                            ON StockFournisseur.idBoissonStock = Commande_Stock.idBoissonStock
-                        INNER JOIN Commande
-                            ON Commande_Stock.idCommande = Commande.id
-                        WHERE new.idBoissonStock = StockFournisseur.idBoissonStock
-                        AND StockFournisseur.nomFournisseur = Boisson_Fournisseur.nomFournisseur
-                        AND Commande.commandeFournisseur = true) THEN
-            RETURN NEW;
-        ELSE
-            RAISE EXCEPTION 'Le fournisseur ne dispose pas de la boisson #%', new.idBoissonStock;
-        END IF;
-    END IF;
-	RETURN NEW;
-    END;
-$BODY$;
-
-CREATE OR REPLACE TRIGGER check_supplier_sell_drink_before_insert_Commande
-BEFORE INSERT OR UPDATE
-ON Commande_Stock
-FOR EACH ROW
-EXECUTE FUNCTION function_check_supplier_sell_drink_commande_stock();
-
 /*==================== Check l'âge des membres lors des commandes clients ====================*/
 CREATE OR REPLACE FUNCTION function_check_member_age_commande_stock() RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -1101,7 +1069,6 @@ INSERT INTO Stock (idBoisson, datePéremption) VALUES (17, '02.08.2023');
 INSERT INTO Stock (idBoisson, datePéremption) VALUES (18, '31.12.2021');
 INSERT INTO Stock (idBoisson, datePéremption) VALUES (18, '01.01.2022');
 INSERT INTO Stock (idBoisson, datePéremption) VALUES (18, '02.01.2022');
-
 
 
 /*================ Stock Fournisseur ====================*/
