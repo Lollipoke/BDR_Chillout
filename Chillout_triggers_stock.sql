@@ -24,26 +24,24 @@ EXECUTE FUNCTION refill_StockFournisseur();
 LANGUAGE plpgsql
 AS 
 $BODY$
-    DECLARE
-        SommeStock INT;
 	BEGIN
 		IF EXISTS(SELECT 1 FROM Commande WHERE Commande.id = NEW.idCommande AND Commande.commandeFournisseur = FALSE) THEN
-            SELECT COALESCE(SUM(Commande_Stock.quantité), 0) INTO SommeStock
-                FROM Commande_Stock
-                INNER JOIN Commande
-                ON Commande_Stock.idCommande = Commande.id
-                WHERE Commande.commandeFournisseur = TRUE
-                AND NEW.idBoissonStock = Commande_Stock.idBoissonStock
-                -   (SELECT COALESCE(SUM(Commande_Stock.quantité), 0)
+            IF (NEW.quantité <= ((SELECT COALESCE(SUM(Commande_Stock.quantité), 0)
+                					FROM Commande_Stock
+                					INNER JOIN Commande
+                						ON Commande_Stock.idCommande = Commande.id
+                					WHERE Commande.commandeFournisseur = TRUE
+                					AND NEW.idBoissonStock = Commande_Stock.idBoissonStock LIMIT 1)
+                					-   (SELECT COALESCE(SUM(Commande_Stock.quantité), 0)
                         FROM Commande_Stock
                         INNER JOIN Commande
                         ON Commande_Stock.idCommande = Commande.id
                         WHERE Commande.commandeFournisseur = FALSE
-                        AND NEW.idBoissonStock = Commande_Stock.idBoissonStock);
-			IF (NEW.quantité <= SommeStock) THEN
+                        AND NEW.idBoissonStock = Commande_Stock.idBoissonStock LIMIT 1)))
+			THEN
 				RETURN NEW;
 			ELSE
-				raise notice 'Value: %', NEW.idCommande;
+				RAISE NOTICE 'Value: %', NEW.idCommande;
 				RAISE EXCEPTION 'Not enough stock in chillout';
 			END IF;
 		END IF;
@@ -52,7 +50,7 @@ $BODY$
 $BODY$;
 
 CREATE OR REPLACE TRIGGER check_before_insert_or_update_commande_stock
-AFTER INSERT OR UPDATE
+BEFORE INSERT OR UPDATE
 ON Commande_Stock
 FOR EACH ROW
 EXECUTE FUNCTION check_disponibilité_boisson();*/
