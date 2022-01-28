@@ -93,11 +93,16 @@ $BODY$
         member_age INT;
 	BEGIN
         SELECT agemin INTO min_age FROM BoissonAlcoolisée WHERE idBoisson = NEW.idBoissonStock;
+        IF (min_age IS NULL) THEN
+            min_age := 0;
+        END IF;
+        raise notice 'Value min_age: %', min_age;
         SELECT EXTRACT(YEAR FROM AGE(NOW(), dateNaissance)) INTO member_age FROM Personne INNER JOIN Membre ON Membre.idPersonne = Personne.id INNER JOIN Commande ON Commande.idPersonne = Personne.id WHERE Commande.id = NEW.idCommande;
+        raise notice 'Value member_age: %', member_age;
         IF (member_age >= min_age) THEN
             RETURN NEW;
         ELSE
-            RAISE EXCEPTION 'L''age du client ne permet pas l''achat de cette boisson';
+            RAISE EXCEPTION 'L''age du client ne permet pas l''achat de cette boisson % %', min_age, member_age;
         END IF;
     END;
 $BODY$;
