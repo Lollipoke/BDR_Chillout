@@ -1,6 +1,8 @@
-package ch.heig.ui;
+package ch.heig;
 
 import ch.heig.db.DBConnection;
+import ch.heig.ui.MembreUI;
+import ch.heig.ui.StaffUI;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
