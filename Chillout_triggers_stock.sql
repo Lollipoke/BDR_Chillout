@@ -18,23 +18,6 @@ ON StockFournisseur
 FOR EACH ROW
 EXECUTE FUNCTION refill_StockFournisseur();
 
-/*=============================== Decompte StockFournisseur TRIGGER ==========================*/
-CREATE OR REPLACE FUNCTION decompte_stockFournisseur() RETURNS TRIGGER
-LANGUAGE plpgsql
-AS 
-$BODY$
-	BEGIN
-		EXECUTE ('UPDATE StockFournisseur SET quantité = 10 WHERE quantité < 2');
-		RETURN NULL;
-	END;
-	
-$BODY$;
-
-CREATE OR REPLACE TRIGGER decompte_after_insert_or_update_StockFournisseur
-AFTER INSERT OR UPDATE 
-ON StockFournisseur
-FOR EACH ROW
-EXECUTE FUNCTION decompte_StockFournisseur();
 
 /*=============================== [WIP] Quantité de boisson en stock suffisante au chillout pour quantité de boisson commandé TRIGGER ==========================*/
 /*CREATE OR REPLACE FUNCTION check_disponibilité_boisson() RETURNS TRIGGER
