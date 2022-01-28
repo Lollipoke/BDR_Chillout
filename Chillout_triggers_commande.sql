@@ -45,8 +45,8 @@ $BODY$
     END;
 $BODY$;
 
-CREATE OR REPLACE TRIGGER check_quantity_ChilloutStock_before_insert_Commande
-BEFORE INSERT
+CREATE OR REPLACE TRIGGER check_quantity_ChilloutStock_before_insert_or_update_Commande
+BEFORE INSERT OR UPDATE
 ON Commande_Stock
 FOR EACH ROW
 EXECUTE FUNCTION function_check_disponibilité_Boisson_commande_stock();
@@ -82,3 +82,28 @@ BEFORE INSERT OR UPDATE
 ON Commande_Stock
 FOR EACH ROW
 EXECUTE FUNCTION function_check_supplier_sell_drink_commande_stock();
+
+/*=============================== Check member legal age TRIGGER ==========================*/
+CREATE OR REPLACE FUNCTION function_check_member_age_commande_stock() RETURNS TRIGGER
+LANGUAGE plpgsql
+AS
+$BODY$
+    DECLARE
+        min_age INT;
+        member_age INT;
+	BEGIN
+        SELECT agemin INTO min_age FROM BoissonAlcoolisée WHERE idBoisson = NEW.idBoissonStock;
+        SELECT EXTRACT(YEAR FROM AGE(NOW(), dateNaissance)) INTO member_age FROM Personne INNER JOIN Membre ON Membre.idPersonne = Personne.id INNER JOIN Commande ON Commande.idPersonne = Personne.id WHERE Commande.id = NEW.idCommande;
+        IF (member_age >= min_age) THEN
+            RETURN NEW;
+        ELSE
+            RAISE EXCEPTION 'L''age du client ne permet pas l''achat de cette boisson';
+        END IF;
+    END;
+$BODY$;
+
+CREATE OR REPLACE TRIGGER check_supplier_sell_drink_before_insert_or_update_Commande
+BEFORE INSERT OR UPDATE
+ON Commande_Stock
+FOR EACH ROW
+EXECUTE FUNCTION function_check_member_age_commande_stock();
