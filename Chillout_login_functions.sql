@@ -15,7 +15,7 @@ BEGIN
     END IF;
     RETURN staff_exists;    
 END; 
-$BODY$
+$BODY$;
 
 
 CREATE OR REPLACE FUNCTION membre_exists(nomUser IN VARCHAR, idUser IN SMALLINT) RETURNS boolean
@@ -35,4 +35,4 @@ BEGIN
     END IF;
     RETURN membre_exists;    
 END; 
-$BODY$
+$BODY$;
